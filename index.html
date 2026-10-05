@@ -1,452 +1,804 @@
-<!-- 顶栏 -->
-<header class="border-b border-stone-800 bg-stone-950/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
-            <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold text-lg neon-glow">9</div>
-            <h1 class="font-bold text-lg tracking-wider bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">K-BAND TOP 9 专属甄选</h1>
-        </div>
-        <div class="text-xs text-stone-400">
-            ✨ 
-        </div>
-    </div>
-</header>
-
-<!-- 主内容区 -->
-<main class="flex-grow max-w-5xl mx-auto w-full px-4 py-8 flex flex-col justify-center items-center">
-
-    <!-- 1. 欢迎引导页 -->
-    <div id="welcome-screen" class="text-center max-w-2xl py-12">
-        <div class="inline-block px-4 py-1.5 mb-6 rounded-full bg-purple-950/60 border border-purple-800 text-purple-300 text-xs tracking-widest uppercase">
-            Classic Tournament • Custom Images Embedded
-        </div>
-        <h2 class="text-3xl sm:text-5xl font-black mb-6 tracking-tight leading-tight">
-            寻找你心目中的<br><span class="bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 bg-clip-text text-transparent">韩国乐队最爱 Top 9</span>
-        </h2>
-        <p class="text-stone-400 text-sm sm:text-base mb-8 leading-relaxed">
-            收录了 <span id="total-bands-count" class="text-purple-400 font-bold"></span> 支韩国顶尖独立与摇滚乐队。<br>
-            采用经典 **“9选3” -> “6选3” -> “2选1”** 科学赛制，<br>每支乐队至少登场 3 次以上，完美避开遗珠！
-        </p>
-        <button onclick="startSelection()" class="px-8 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-base hover:opacity-95 transition neon-glow tracking-wider shadow-lg">
-            开始甄选之旅 ➔
-        </button>
-    </div>
-
-    <!-- 2. 投票甄选页 -->
-    <div id="voting-screen" class="w-full hidden">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 bg-stone-900/60 border border-stone-800 p-4 rounded-xl gap-3">
-            <div>
-                <div class="text-xs text-purple-400 uppercase tracking-wider font-semibold" id="stage-title">阶段：小组赛 9 选 3</div>
-                <h3 class="text-lg font-bold text-stone-100" id="stage-desc">请从下列 9 个乐队中，精准选出你最喜欢的 <span id="pick-target-num" class="text-pink-400">3</span> 个</h3>
-            </div>
-            <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-end">
-                <span class="text-xs text-stone-400" id="round-indicator">阶段进度 1 / 30</span>
-                <div class="w-32 bg-stone-800 h-2 rounded-full overflow-hidden">
-                    <div id="progress-bar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-full w-0 transition-all duration-300"></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="candidates-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8"></div>
-
-        <div class="flex items-center justify-between border-t border-stone-800 pt-6">
-            <div class="text-xs text-stone-400">
-                已选择: <span id="selected-count" class="font-bold text-pink-400">0</span> / <span id="max-select-count">3</span>
-            </div>
-            <button id="next-btn" onclick="submitCurrentGroup()" disabled class="px-6 py-3 rounded-xl bg-stone-800 text-stone-500 font-bold text-sm cursor-not-allowed transition shadow-lg">
-                请选择指定数量的乐队
-            </button>
-        </div>
-    </div>
-
-    <!-- 3. 最终结果页 -->
-    <div id="result-screen" class="w-full hidden flex flex-col items-center">
-        <div class="text-center mb-6">
-            <div class="inline-block px-4 py-1.5 mb-2 rounded-full bg-pink-950/60 border border-pink-800 text-pink-300 text-xs tracking-widest uppercase">
-                Your Ultimate K-Band Top 9
-            </div>
-            <h2 class="text-3xl font-black tracking-tight">专属韩国乐队最爱排行</h2>
-            <p class="text-stone-400 text-xs mt-1">基于多轮经典晋级赛科学计算生成</p>
-        </div>
-
-        <div id="poster-card" class="w-full max-w-2xl bg-stone-900 border border-stone-800 rounded-2xl p-6 sm:p-8 neon-glow relative overflow-hidden mb-6">
-            <div class="absolute -top-24 -right-24 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-pink-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div class="flex items-center justify-between border-b border-stone-800 pb-4 mb-6">
-                <div>
-                    <h3 class="font-black text-xl tracking-wider text-white">MY K-BAND TOP 9</h3>
-                    <p class="text-xs text-stone-400">韩国独立/摇滚乐队私藏榜单</p>
-                </div>
-                <div class="text-right">
-                    <span class="text-[10px] uppercase tracking-widest px-2.5 py-1 rounded bg-purple-950 text-purple-300 border border-purple-800">Verified</span>
-                </div>
-            </div>
-
-            <div id="top9-grid" class="grid grid-cols-3 gap-3 sm:gap-4 mb-6"></div>
-
-            <div class="flex items-center justify-between text-[11px] text-stone-500 border-t border-stone-800/60 pt-4">
-                <span>Generated by K-Band Classic Tournament</span>
-                <span class="font-mono">#KINDIE #KBAND</span>
-            </div>
-        </div>
-
-        <div class="flex flex-wrap justify-center gap-4">
-            <button onclick="downloadPoster()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-sm hover:opacity-95 transition shadow-lg flex items-center space-x-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                <span>保存高清海报图片</span>
-            </button>
-            <button onclick="location.reload()" class="px-6 py-3 rounded-xl border border-stone-700 bg-stone-900 text-stone-300 font-bold text-sm hover:bg-stone-800 transition">
-                重新测试
-            </button>
-        </div>
-    </div>
-
-</main>
-
-<footer class="text-center py-4 text-xs text-stone-600 border-t border-stone-900">
-    K-Band Top 9 Selector &bull; Multi-Stage Tournament Rules
-</footer>
-
-<script>
-    // 1. 已更新为你提供的所有自定义图片直链
-    const defaultCustomImages = {
-        "DAY6": "[http://t.cn/AXW1wZYi](http://t.cn/AXW1wZYi)",
-        "QWER": "[http://t.cn/AXW1wZYx](http://t.cn/AXW1wZYx)",
-        "Xdinary Heroes": "[http://t.cn/AXW1wZYJ](http://t.cn/AXW1wZYJ)",
-        "FTIsland": "[http://t.cn/AXW1wZYM](http://t.cn/AXW1wZYM)",
-        "CNBLUE": "[http://t.cn/AXW1Lyzc](http://t.cn/AXW1Lyzc)",
-        "N.Flying": "[http://t.cn/AXW1Lyzi](http://t.cn/AXW1Lyzi)",
-        "AxMxP": "[http://t.cn/AXW1LyzI](http://t.cn/AXW1LyzI)",
-        "ONEWE": "[http://t.cn/AXW1LyzV](http://t.cn/AXW1LyzV)",
-        "LUCY": "[http://t.cn/AXW1Lyzf](http://t.cn/AXW1Lyzf)",
-        "splayit": "[http://t.cn/AXW1LyzK](http://t.cn/AXW1LyzK)",
-        "hrtz.wav": "[http://t.cn/AXW1Lyz9](http://t.cn/AXW1Lyz9)",
-        "HiFi-Unicorn": "[http://t.cn/AXW1Lyz0](http://t.cn/AXW1Lyz0)",
-        "catch the young": "[http://t.cn/AXW1Lyzp](http://t.cn/AXW1Lyzp)",
-        "V01D": "[http://t.cn/AXW1LyzT](http://t.cn/AXW1LyzT)",
-        "Chrocktikal": "[http://t.cn/AXW1Lyzs](http://t.cn/AXW1Lyzs)",
-        "Dragon Pony": "[http://t.cn/AXW1LyZZ](http://t.cn/AXW1LyZZ)",
-        "skipjack": "[http://t.cn/AXW1LyZh](http://t.cn/AXW1LyZh)",
-        "DADADA": "[http://t.cn/AXW1LyZP](http://t.cn/AXW1LyZP)",
-        "Redoor": "[http://t.cn/AXW1LyZ2](http://t.cn/AXW1LyZ2)",
-        "creespy": "[http://t.cn/AXW1LyZL](http://t.cn/AXW1LyZL)",
-        "The Fix": "[http://t.cn/AXW1LyZG](http://t.cn/AXW1LyZG)",
-        "KARDI": "[http://t.cn/AXW1LyZq](http://t.cn/AXW1LyZq)",
-        "NerdConnection": "[http://t.cn/AXW1LyZV](http://t.cn/AXW1LyZV)",
-        "Can't be blue": "[http://t.cn/AXW1LyZI](http://t.cn/AXW1LyZI)",
-        "Tokai": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/746394606_17936666199309634_1177925176816424237_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=gnkw0RW9XogQ7kNvwHR_-p2&_nc_oc=Adr6v6kugDkmk86SOou69VlIi_kCTrtqJvlHhlGTAKTVYlVjdz6dKhonw3xeWUXR4lMGAxlDgHzLyVkbPOybqKWY&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=QPOl7Kb2Z44RAh46qcTepg&_nc_ss=79aaf&oh=00_AQMAhgXOembUUUe8HYjQ8D0NFEd6j-7Pfmmy3TqfWjiKxw&oe=6AC90D2E](https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/746394606_17936666199309634_1177925176816424237_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=gnkw0RW9XogQ7kNvwHR_-p2&_nc_oc=Adr6v6kugDkmk86SOou69VlIi_kCTrtqJvlHhlGTAKTVYlVjdz6dKhonw3xeWUXR4lMGAxlDgHzLyVkbPOybqKWY&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=QPOl7Kb2Z44RAh46qcTepg&_nc_ss=79aaf&oh=00_AQMAhgXOembUUUe8HYjQ8D0NFEd6j-7Pfmmy3TqfWjiKxw&oe=6AC90D2E)",
-        "simileland": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/620921830_18557327464062803_4838205366984050630_n.jpg?_nc_cat=104&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=i8xHdFSrtsEQ7kNvwFgUeWU&_nc_oc=AdqywvT3TexhJ4jo7kp5sCDj3WVhF2DWr0ibD8uVEkRSrT_q1CBkHobFuV4NP6CyFnRXhqme7Lrp02jCJPNSThTk&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=0cYgc2UvToZv3kHj4swjwA&_nc_ss=79aaf&oh=00_AQOY2kPSB_4f1La-1-IklquYgBcI4-te8oElhlo-Xuretg&oe=6AC90B01](https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/620921830_18557327464062803_4838205366984050630_n.jpg?_nc_cat=104&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=i8xHdFSrtsEQ7kNvwFgUeWU&_nc_oc=AdqywvT3TexhJ4jo7kp5sCDj3WVhF2DWr0ibD8uVEkRSrT_q1CBkHobFuV4NP6CyFnRXhqme7Lrp02jCJPNSThTk&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=0cYgc2UvToZv3kHj4swjwA&_nc_ss=79aaf&oh=00_AQOY2kPSB_4f1La-1-IklquYgBcI4-te8oElhlo-Xuretg&oe=6AC90B01)",
-        "Silicagel": "[https://scontent-hkg4-2.cdninstagram.com/v/t51.82787-19/787889039_18583615852071623_773986358231920683_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MjAuQzMifQ%3D%3D&_nc_ohc=GDOQAUuVemYQ7kNvwElZu51&_nc_oc=AdrWa3xmF7giPwyrIuAhOHYLD2WLNnJlRsPrYxyqoDJMfak-qUQWKWfgGyLLaK3F2TNxiwnPVCdSE-NG88m3DzD3&_nc_zt=24&_nc_ht=scontent-hkg4-2.cdninstagram.com&_nc_gid=m85YZXJsirNPQTHojL_Ueg&_nc_ss=79aaf&oh=00_AQN3fFCGAtuFouMc5WO2-cwmOYr6e04OowV9KJnZDj0PTw&oe=6AC907FA](https://scontent-hkg4-2.cdninstagram.com/v/t51.82787-19/787889039_18583615852071623_773986358231920683_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MjAuQzMifQ%3D%3D&_nc_ohc=GDOQAUuVemYQ7kNvwElZu51&_nc_oc=AdrWa3xmF7giPwyrIuAhOHYLD2WLNnJlRsPrYxyqoDJMfak-qUQWKWfgGyLLaK3F2TNxiwnPVCdSE-NG88m3DzD3&_nc_zt=24&_nc_ht=scontent-hkg4-2.cdninstagram.com&_nc_gid=m85YZXJsirNPQTHojL_Ueg&_nc_ss=79aaf&oh=00_AQN3fFCGAtuFouMc5WO2-cwmOYr6e04OowV9KJnZDj0PTw&oe=6AC907FA)",
-        "Far east asian tigers": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.2885-19/402910883_1321244405424403_3560346435370687045_n.jpg?_nc_cat=103&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy40MDAuQzMifQ%3D%3D&_nc_ohc=LSbfPKRFv-MQ7kNvwH2xomZ&_nc_oc=AdruvOWNz_k3WtjytLmCgSnu1qA_qSt5gRdL78g4xAOiw45CxeCKB62d0MwocSkE0sva9MeHGm3Q6_T59swq3by9&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQPRcZ_gBd0SPJ3cilRY9TPlOfvWM0BxaXZIV-AdilVhlA&oe=6AC8EEC0](https://scontent-hkg1-2.cdninstagram.com/v/t51.2885-19/402910883_1321244405424403_3560346435370687045_n.jpg?_nc_cat=103&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy40MDAuQzMifQ%3D%3D&_nc_ohc=LSbfPKRFv-MQ7kNvwH2xomZ&_nc_oc=AdruvOWNz_k3WtjytLmCgSnu1qA_qSt5gRdL78g4xAOiw45CxeCKB62d0MwocSkE0sva9MeHGm3Q6_T59swq3by9&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQPRcZ_gBd0SPJ3cilRY9TPlOfvWM0BxaXZIV-AdilVhlA&oe=6AC8EEC0)",
-        "RedC": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.2885-19/436566890_1877172006130595_6209572191042848923_n.jpg?_nc_cat=107&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy42OTkuQzMifQ%3D%3D&_nc_ohc=uUEs0o7d6ukQ7kNvwGtxiNt&_nc_oc=AdoqxBvAaas6Mo23ybBfiQfb2pwGRdBEGHjHiu8H8DVLfIyY0omO2iaq-2BavhFxP0iFVTTbw7u6Sej6MXSq_yrn&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQMAGEuf3zsxkVXJV1s44G-_oiGDPEgN6Ky59Cu8PS3VgQ&oe=6AC8E323](https://scontent-hkg1-2.cdninstagram.com/v/t51.2885-19/436566890_1877172006130595_6209572191042848923_n.jpg?_nc_cat=107&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy42OTkuQzMifQ%3D%3D&_nc_ohc=uUEs0o7d6ukQ7kNvwGtxiNt&_nc_oc=AdoqxBvAaas6Mo23ybBfiQfb2pwGRdBEGHjHiu8H8DVLfIyY0omO2iaq-2BavhFxP0iFVTTbw7u6Sej6MXSq_yrn&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQMAGEuf3zsxkVXJV1s44G-_oiGDPEgN6Ky59Cu8PS3VgQ&oe=6AC8E323)",
-        "leeparan": "[https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/704592438_17971439334049954_7533395970046655240_n.jpg?_nc_cat=101&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy44NTEuQzMifQ%3D%3D&_nc_ohc=baLiTueyH5AQ7kNvwHn0Nuv&_nc_oc=AdpRrTwtxy9AHioPjrfT5bzwwub-Q8-Fn0w90052hVDTwje1NREcrXGaitw2dZtDw_pVXEn2IwZs9k5C-dFouJJv&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=cCXzmDV0Apnmcex7nMm22w&_nc_ss=79aaf&oh=00_AQMWmeRowA3bvkMYhWtL0pFsro7ljFJq1MTQ5QE86tjzPg&oe=6AC9072D](https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/704592438_17971439334049954_7533395970046655240_n.jpg?_nc_cat=101&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy44NTEuQzMifQ%3D%3D&_nc_ohc=baLiTueyH5AQ7kNvwHn0Nuv&_nc_oc=AdpRrTwtxy9AHioPjrfT5bzwwub-Q8-Fn0w90052hVDTwje1NREcrXGaitw2dZtDw_pVXEn2IwZs9k5C-dFouJJv&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=cCXzmDV0Apnmcex7nMm22w&_nc_ss=79aaf&oh=00_AQMWmeRowA3bvkMYhWtL0pFsro7ljFJq1MTQ5QE86tjzPg&oe=6AC9072D)",
-        "李承允": "[https://pbs.twimg.com/media/GjFjEOFbIAAY279?format=jpg&name=4096x4096](https://pbs.twimg.com/media/GjFjEOFbIAAY279?format=jpg&name=4096x4096)",
-        "POSER": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/689521359_17952963723139169_17215926164811928_n.jpg?_nc_cat=103&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy45MTEuQzMifQ%3D%3D&_nc_ohc=ubfkXe3KYRgQ7kNvwF23cAQ&_nc_oc=Adp3OhRMb7LWXrZlgtFc8VuRAZ7rWjQRdGnYKtT0wClHYKbQukJlPKncIYI9kk20qhM5AzOzTyH48q2vn6RymTev&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=tEL8mRvKVF-qAqbdjRqXLQ&_nc_ss=79aaf&oh=00_AQMHayEeOIYIO2Kt2dczU5e_bWhIyRW_Zxw_4Y08-dVpVg&oe=6AC9054D](https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/689521359_17952963723139169_17215926164811928_n.jpg?_nc_cat=103&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy45MTEuQzMifQ%3D%3D&_nc_ohc=ubfkXe3KYRgQ7kNvwF23cAQ&_nc_oc=Adp3OhRMb7LWXrZlgtFc8VuRAZ7rWjQRdGnYKtT0wClHYKbQukJlPKncIYI9kk20qhM5AzOzTyH48q2vn6RymTev&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=tEL8mRvKVF-qAqbdjRqXLQ&_nc_ss=79aaf&oh=00_AQMHayEeOIYIO2Kt2dczU5e_bWhIyRW_Zxw_4Y08-dVpVg&oe=6AC9054D)",
-        "NELL": "[https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdSX5RYUWZC_ALUqolcuyhRorXa6vVozjeqYAMz3bpVg&s=10](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdSX5RYUWZC_ALUqolcuyhRorXa6vVozjeqYAMz3bpVg&s=10)",
-        "crying nut": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/14607048_510155712520934_4404950207175852032_a.jpg?_nc_cat=108&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xNTEuQzMifQ%3D%3D&_nc_ohc=bW7h9HMEZRcQ7kNvwFsFAL0&_nc_oc=AdrvgnstZXnUzigq_8QZm4KsFlhe68GyLUwOvq9DDj6ZfvS9rBql8TZZoTt1UMQ5Py0LmCn4OxO_l16KKuLqyb8v&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQM1ES1PZnsumEIt-55ewzmDzDgXWBuAnPcTigpYsNBPuw&oe=6AC8E629](https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/14607048_510155712520934_4404950207175852032_a.jpg?_nc_cat=108&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xNTEuQzMifQ%3D%3D&_nc_ohc=bW7h9HMEZRcQ7kNvwFsFAL0&_nc_oc=AdrvgnstZXnUzigq_8QZm4KsFlhe68GyLUwOvq9DDj6ZfvS9rBql8TZZoTt1UMQ5Py0LmCn4OxO_l16KKuLqyb8v&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQM1ES1PZnsumEIt-55ewzmDzDgXWBuAnPcTigpYsNBPuw&oe=6AC8E629)",
-        "NoBrain": "[https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1MiG_FkKZRjtmz8nBn6eEVOJCwzG_h70ISWE7bBc2Dw&s=10](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1MiG_FkKZRjtmz8nBn6eEVOJCwzG_h70ISWE7bBc2Dw&s=10)",
-        "bluhwa": "[https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/662300139_18044114036775796_5988510930386549193_n.jpg?_nc_cat=109&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDI0LkMzIn0%3D&_nc_ohc=bFSdBuR1GfMQ7kNvwFExuJs&_nc_oc=Adqu4KkYhRvAI6gCbPIiNJd27jRUKirA4uoKBEGMRXyXR5rCQbVzxNect4mEULGw-0CP5Pl9InCznhshSQRPHSd2&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=Wkayq8KBuleMYLsvJHC8UQ&_nc_ss=792a8&oh=00_AQP_0vxnY01nT4FxbsPGFWdJpyTPC0JAxGkfVdecugE_4w&oe=6AC909F3](https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/662300139_18044114036775796_5988510930386549193_n.jpg?_nc_cat=109&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDI0LkMzIn0%3D&_nc_ohc=bFSdBuR1GfMQ7kNvwFExuJs&_nc_oc=Adqu4KkYhRvAI6gCbPIiNJd27jRUKirA4uoKBEGMRXyXR5rCQbVzxNect4mEULGw-0CP5Pl9InCznhshSQRPHSd2&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=Wkayq8KBuleMYLsvJHC8UQ&_nc_ss=792a8&oh=00_AQP_0vxnY01nT4FxbsPGFWdJpyTPC0JAxGkfVdecugE_4w&oe=6AC909F3)",
-        "jisokuryclub": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/817719239_18037821761832543_6426761968332740_n.jpg?_nc_cat=102&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=puyBKXod74IQ7kNvwGEE5QB&_nc_oc=AdrBsiocK4iN8gBQPDQKZs0xnEoUfD0VXeo3jMEzSqw-N1wM2GwZQvm7FgK7WLyIIgARhmQjaLojuHzXIUG7Yf55&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=8jT2I28tTBVSK7LvZRjT9Q&_nc_ss=79aaf&oh=00_AQPdLvFyPnB80Ro6td-evv4NUD50PruJGksY6DO1R9ZxIw&oe=6AC8E361](https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/817719239_18037821761832543_6426761968332740_n.jpg?_nc_cat=102&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=puyBKXod74IQ7kNvwGEE5QB&_nc_oc=AdrBsiocK4iN8gBQPDQKZs0xnEoUfD0VXeo3jMEzSqw-N1wM2GwZQvm7FgK7WLyIIgARhmQjaLojuHzXIUG7Yf55&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=8jT2I28tTBVSK7LvZRjT9Q&_nc_ss=79aaf&oh=00_AQPdLvFyPnB80Ro6td-evv4NUD50PruJGksY6DO1R9ZxIw&oe=6AC8E361)",
-        "blueisnotblue": "[https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/670062625_17898390981425026_6491461293997080826_n.jpg?_nc_cat=105&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=lp4NXtx5NaQQ7kNvwFtFlC0&_nc_oc=Adrub3I3LtKwINvnXuU9LizypY9aUAZagfLf3sDFXFKiLWNCEpNoH0xHk9vE8koV6gZFIBrvJ54ewuj0E2XSVi1d&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=9WiDczI2SbFNLl2hqjjw-Q&_nc_ss=79aaf&oh=00_AQPEHtOfMSbBEapddKhCcsWGbF9Jd0cj5wbemPN3B9qheA&oe=6AC8FC16](https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/670062625_17898390981425026_6491461293997080826_n.jpg?_nc_cat=105&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=lp4NXtx5NaQQ7kNvwFtFlC0&_nc_oc=Adrub3I3LtKwINvnXuU9LizypY9aUAZagfLf3sDFXFKiLWNCEpNoH0xHk9vE8koV6gZFIBrvJ54ewuj0E2XSVi1d&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=9WiDczI2SbFNLl2hqjjw-Q&_nc_ss=79aaf&oh=00_AQPEHtOfMSbBEapddKhCcsWGbF9Jd0cj5wbemPN3B9qheA&oe=6AC8FC16)",
-        "dabda": "[https://scontent-hkg4-2.cdninstagram.com/v/t51.2885-19/359744410_963287228335273_7289995570363138219_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=RQHdhaNap6wQ7kNvwG2760f&_nc_oc=AdqySF0xn5wZBfwQniJR3FDX-PE56laG_G9IJvIwwaZWglKZAu1UHfRRzggmds0ERh4cYJ2j8maVIwC5EqQ_q1C3&_nc_zt=24&_nc_ht=scontent-hkg4-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQN0Y_Mjr4tTIewXlVaCiCTbrnoknav_25JX4hPwe1qU6w&oe=6AC90EE4](https://scontent-hkg4-2.cdninstagram.com/v/t51.2885-19/359744410_963287228335273_7289995570363138219_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=RQHdhaNap6wQ7kNvwG2760f&_nc_oc=AdqySF0xn5wZBfwQniJR3FDX-PE56laG_G9IJvIwwaZWglKZAu1UHfRRzggmds0ERh4cYJ2j8maVIwC5EqQ_q1C3&_nc_zt=24&_nc_ht=scontent-hkg4-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQN0Y_Mjr4tTIewXlVaCiCTbrnoknav_25JX4hPwe1qU6w&oe=6AC90EE4)",
-        "sonlmor": "[https://scontent-hkg1-1.cdninstagram.com/v/t51.2885-19/466099465_1018455806961527_8023436036919154651_n.jpg?_nc_cat=105&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy40ODEuQzMifQ%3D%3D&_nc_ohc=3_THdevvV5IQ7kNvwGttBaF&_nc_oc=AdoU7u4rNBrV4lyPbtbwOXS-Ux3-oLbO83kHsE0qJllvkKuBgbSMqTQK3ExJOztd4iCKFLfl8zsuezNd2UqaC9bh&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQPAfKJW4FCOkqNSHutDF3WoUsF5soy9zvc0mp1GMmRfSg&oe=6AC8EE4E](https://scontent-hkg1-1.cdninstagram.com/v/t51.2885-19/466099465_1018455806961527_8023436036919154651_n.jpg?_nc_cat=105&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy40ODEuQzMifQ%3D%3D&_nc_ohc=3_THdevvV5IQ7kNvwGttBaF&_nc_oc=AdoU7u4rNBrV4lyPbtbwOXS-Ux3-oLbO83kHsE0qJllvkKuBgbSMqTQK3ExJOztd4iCKFLfl8zsuezNd2UqaC9bh&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQPAfKJW4FCOkqNSHutDF3WoUsF5soy9zvc0mp1GMmRfSg&oe=6AC8EE4E)",
-        "喜鹊山": "[https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/541543600_18005786174797849_175469594620624761_n.jpg?_nc_cat=109&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=4l1KVu8T3AgQ7kNvwGLc_UI&_nc_oc=Adq1XaqF2rUDK90Buhuk66hJYeY95IglIIVHhYh0K1uBE-DPnFbkgEq0NX07Y7MyHL8k_GCEB0zxSE977sy9Hsd3&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=IpP5Q5J7kZOF6iaEb--EZw&_nc_ss=79aaf&oh=00_AQPYB0QW6LNeDguMG8_eFngdg-iA7PKA78lYfjBEa6Qm7Q&oe=6AC8F48D](https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/541543600_18005786174797849_175469594620624761_n.jpg?_nc_cat=109&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=4l1KVu8T3AgQ7kNvwGLc_UI&_nc_oc=Adq1XaqF2rUDK90Buhuk66hJYeY95IglIIVHhYh0K1uBE-DPnFbkgEq0NX07Y7MyHL8k_GCEB0zxSE977sy9Hsd3&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=IpP5Q5J7kZOF6iaEb--EZw&_nc_ss=79aaf&oh=00_AQPYB0QW6LNeDguMG8_eFngdg-iA7PKA78lYfjBEa6Qm7Q&oe=6AC8F48D)",
-        "illuvan": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/554915844_17876920536418106_6491662521897483842_n.jpg?_nc_cat=103&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=0lNbk2VEBDQQ7kNvwF7YHMo&_nc_oc=Adp54C7DPqZKIIW5FuUZE2c5lEXWX-QCIMsfMXEdt40U1cG1sUhvSHaZrf4YyStolkFbnz7dakCIg-zXDJ6WbXYA&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=bFM5g8NvnEJjKtLdi_02OQ&_nc_ss=792a8&oh=00_AQNrs1UEavfhRtN1GAZXJrA4r9LHnq9KKnJWtDghVnnP-w&oe=6AC8FC47](https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/554915844_17876920536418106_6491662521897483842_n.jpg?_nc_cat=103&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=0lNbk2VEBDQQ7kNvwF7YHMo&_nc_oc=Adp54C7DPqZKIIW5FuUZE2c5lEXWX-QCIMsfMXEdt40U1cG1sUhvSHaZrf4YyStolkFbnz7dakCIg-zXDJ6WbXYA&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=bFM5g8NvnEJjKtLdi_02OQ&_nc_ss=792a8&oh=00_AQNrs1UEavfhRtN1GAZXJrA4r9LHnq9KKnJWtDghVnnP-w&oe=6AC8FC47)",
-        "HANRORO": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/742198120_18153550936449569_796360094198768405_n.jpg?_nc_cat=106&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=_Wpy0hPZjuYQ7kNvwH19ii-&_nc_oc=Adqpb4aYbq6zkr7yusrbhaS00gwCwzFtMwJCNkASCXBFJyEIX6ZtyzoT4jhnADI3pSJrpZfbgDpy9WJzL7qta9-v&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=8ZsmNNb2n4V1wK9-t1jClQ&_nc_ss=79aaf&oh=00_AQPz7AyV2BozJPNLoFv1aLLK4e42OlE5KQzEk6lupF3Bvw&oe=6AC9034C](https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/742198120_18153550936449569_796360094198768405_n.jpg?_nc_cat=106&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=_Wpy0hPZjuYQ7kNvwH19ii-&_nc_oc=Adqpb4aYbq6zkr7yusrbhaS00gwCwzFtMwJCNkASCXBFJyEIX6ZtyzoT4jhnADI3pSJrpZfbgDpy9WJzL7qta9-v&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=8ZsmNNb2n4V1wK9-t1jClQ&_nc_ss=79aaf&oh=00_AQPz7AyV2BozJPNLoFv1aLLK4e42OlE5KQzEk6lupF3Bvw&oe=6AC9034C)",
-        "TuesdayBeachClub": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.2885-19/336427771_954996002526160_159501323880093579_n.jpg?_nc_cat=104&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=MVCIuEsx1JAQ7kNvwE0gHHN&_nc_oc=AdrpaJJN57t8jD_IKQ0ge1CUXvcemMg7pxJz0ePXhcdSoac1E_6q-uCuoB0WzneLwCDXn8-a2oldxCekp9AUqxXg&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQNI19MvjXam3dQGhkQTlvT_FGblSl2ebfU0UehPdg2kMA&oe=6AC8F48B](https://scontent-hkg1-2.cdninstagram.com/v/t51.2885-19/336427771_954996002526160_159501323880093579_n.jpg?_nc_cat=104&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=MVCIuEsx1JAQ7kNvwE0gHHN&_nc_oc=AdrpaJJN57t8jD_IKQ0ge1CUXvcemMg7pxJz0ePXhcdSoac1E_6q-uCuoB0WzneLwCDXn8-a2oldxCekp9AUqxXg&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQNI19MvjXam3dQGhkQTlvT_FGblSl2ebfU0UehPdg2kMA&oe=6AC8F48B)",
-        "DamonsYear": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/590177223_18545618695034633_1197954982182115797_n.jpg?_nc_cat=108&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy40NTAuQzMifQ%3D%3D&_nc_ohc=wGsvxvS11ucQ7kNvwFVIMCM&_nc_oc=AdrbRHlFmpt1oeHfPaYn4lKmHxTaBSXUZ7q8tjz1hGHU4OLfd4nZRNzuQ1lx0qWh1AKwF0PkMv5PUeSDFEH1TI8G&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=gq091gXvH6qEzYx8uy517A&_nc_ss=79aaf&oh=00_AQNvGSChOCOi-6Otc4a_uSQ278nFQlbi0WgqHQvsj1XeUQ&oe=6AC8F9A9](https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/590177223_18545618695034633_1197954982182115797_n.jpg?_nc_cat=108&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy40NTAuQzMifQ%3D%3D&_nc_ohc=wGsvxvS11ucQ7kNvwFVIMCM&_nc_oc=AdrbRHlFmpt1oeHfPaYn4lKmHxTaBSXUZ7q8tjz1hGHU4OLfd4nZRNzuQ1lx0qWh1AKwF0PkMv5PUeSDFEH1TI8G&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=gq091gXvH6qEzYx8uy517A&_nc_ss=79aaf&oh=00_AQNvGSChOCOi-6Otc4a_uSQ278nFQlbi0WgqHQvsj1XeUQ&oe=6AC8F9A9)",
-        "Adios Audio": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/489425204_8914540178647527_2358204473488947574_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=Vd7cIq0GnIEQ7kNvwFs9iHT&_nc_oc=Ado1F7mgrNqH4pOeGyqk0d9CXTPVr_WGgrnktSnUUpcFQHa3a46w4_XVmR-JSsIweqMMY8K_wuspADNCA1UX-lsl&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQNznQcr6lVw1Bv_YiCj6vt566IrgZnLxX_EJowcaOip5w&oe=6AC902DC](https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/489425204_8914540178647527_2358204473488947574_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=Vd7cIq0GnIEQ7kNvwFs9iHT&_nc_oc=Ado1F7mgrNqH4pOeGyqk0d9CXTPVr_WGgrnktSnUUpcFQHa3a46w4_XVmR-JSsIweqMMY8K_wuspADNCA1UX-lsl&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQNznQcr6lVw1Bv_YiCj6vt566IrgZnLxX_EJowcaOip5w&oe=6AC902DC)",
-        "THORNAPPLE": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/715465131_18535024189073149_7021168066534998972_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDAxLkMzIn0%3D&_nc_ohc=6fo7QpSqLsgQ7kNvwHcMJIa&_nc_oc=AdpAtvWS2pHMYdtLVe8lTcgbiy4JKjpmvu6KjyYFZ0WzFEu8VthhH_SzG2_AcqL9PchXtEvOtzjsRBCX-ivrwZWn&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=ZWpICAw-x3oaWPmjhO0shQ&_nc_ss=79aaf&oh=00_AQM9QRzK3hWf27DSYbsHLej30biPUYOnQGc3noxe-KdO8Q&oe=6AC8E2C6](https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/715465131_18535024189073149_7021168066534998972_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDAxLkMzIn0%3D&_nc_ohc=6fo7QpSqLsgQ7kNvwHcMJIa&_nc_oc=AdpAtvWS2pHMYdtLVe8lTcgbiy4JKjpmvu6KjyYFZ0WzFEu8VthhH_SzG2_AcqL9PchXtEvOtzjsRBCX-ivrwZWn&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=ZWpICAw-x3oaWPmjhO0shQ&_nc_ss=79aaf&oh=00_AQM9QRzK3hWf27DSYbsHLej30biPUYOnQGc3noxe-KdO8Q&oe=6AC8E2C6)",
-        "ConfinedWhite": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/474887662_1351376135856087_5194145663428638922_n.jpg?_nc_cat=106&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy44MDAuQzMifQ%3D%3D&_nc_ohc=qv9UHTJzAG8Q7kNvwHZBExa&_nc_oc=AdoF2UhkVa74gFCXGawTb2LidUMqbSPxfhEvAdzXKceL4DeabuPywm2bSprKe3i8FC86hO7ckJZ3SgTgIHPtbjdt&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQP4Oc02MZgvNul4oTVbWFBT0KMctVQz2RLM1BSh5jYu-Q&oe=6AC8F490](https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/474887662_1351376135856087_5194145663428638922_n.jpg?_nc_cat=106&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy44MDAuQzMifQ%3D%3D&_nc_ohc=qv9UHTJzAG8Q7kNvwHZBExa&_nc_oc=AdoF2UhkVa74gFCXGawTb2LidUMqbSPxfhEvAdzXKceL4DeabuPywm2bSprKe3i8FC86hO7ckJZ3SgTgIHPtbjdt&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQP4Oc02MZgvNul4oTVbWFBT0KMctVQz2RLM1BSh5jYu-Q&oe=6AC8F490)",
-        "Broken Valentine": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/323117265_1315431969191770_422058406019018553_n.jpg?_nc_cat=108&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy43MTUuQzMifQ%3D%3D&_nc_ohc=hNlMSs3s-aoQ7kNvwEadFHf&_nc_oc=Adqvwdgqwg3Ymu6BTyHAMPml78PoFtO9SjNdi-cyuvk4g0ouUxFeMJz0afMA3zUjfJ9LZQG6BtfL_876tCuPX6uw&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQMoB8TqtnaUYKkp4VaFgEYMx18y9NRfBwEsvj-V5Go2_Q&oe=6AC8ECBE](https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/323117265_1315431969191770_422058406019018553_n.jpg?_nc_cat=108&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy43MTUuQzMifQ%3D%3D&_nc_ohc=hNlMSs3s-aoQ7kNvwEadFHf&_nc_oc=Adqvwdgqwg3Ymu6BTyHAMPml78PoFtO9SjNdi-cyuvk4g0ouUxFeMJz0afMA3zUjfJ9LZQG6BtfL_876tCuPX6uw&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQMoB8TqtnaUYKkp4VaFgEYMx18y9NRfBwEsvj-V5Go2_Q&oe=6AC8ECBE)",
-        "gogohawk": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/591399924_18073766993588211_4036232229568971003_n.jpg?_nc_cat=100&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=P_gbJbZ-RUoQ7kNvwGkTOZ9&_nc_oc=AdolV0UtANu-xxZB6Vis8ZRsudFdH4sueOO80WRmmly2MmuNd1xvQWTkpTELGZhuEuXOqjtZmC2A9N_b1T778yGy&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=Es63Pb47tzVlFgZkAcS1Wg&_nc_ss=79aaf&oh=00_AQOyDf7PEBcaPOej_nEIcThwHE_aPHmD0w4Nl-BOYM2yfA&oe=6AC90E44](https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/591399924_18073766993588211_4036232229568971003_n.jpg?_nc_cat=100&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=P_gbJbZ-RUoQ7kNvwGkTOZ9&_nc_oc=AdolV0UtANu-xxZB6Vis8ZRsudFdH4sueOO80WRmmly2MmuNd1xvQWTkpTELGZhuEuXOqjtZmC2A9N_b1T778yGy&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=Es63Pb47tzVlFgZkAcS1Wg&_nc_ss=79aaf&oh=00_AQOyDf7PEBcaPOej_nEIcThwHE_aPHmD0w4Nl-BOYM2yfA&oe=6AC90E44)",
-        "PEPPERTONES": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/436836102_682101027288698_307155803053461473_n.jpg?_nc_cat=106&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=W9o18J7xDasQ7kNvwF3Y1pn&_nc_oc=Adobn1aSRb3ZTaJNTTT3Hm4wZs2AYBJf_ZFeavB8whAmq4MEKs9fMeqh78xFSScZy64RLXSt8wO3HbfyiGnDl6Zp&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQOfrmC3mBz6XdJutY5o_E-X02wo1axJanaYUNtiDl3OFg&oe=6AC8F6DC](https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/436836102_682101027288698_307155803053461473_n.jpg?_nc_cat=106&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=W9o18J7xDasQ7kNvwF3Y1pn&_nc_oc=Adobn1aSRb3ZTaJNTTT3Hm4wZs2AYBJf_ZFeavB8whAmq4MEKs9fMeqh78xFSScZy64RLXSt8wO3HbfyiGnDl6Zp&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQOfrmC3mBz6XdJutY5o_E-X02wo1axJanaYUNtiDl3OFg&oe=6AC8F6DC)",
-        "YB": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/462849931_3691526741112272_3577002629415435246_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MDAuQzMifQ%3D%3D&_nc_ohc=OJFPu581IlAQ7kNvwEqdaMc&_nc_oc=AdrMozpQTKct9Vlcq_7e9pxkUgaR-6rl6ex6FMmVIrnrBk5oKuI_IkspgvHBuLiaSsIFLStSHr-KUo7SxStoJMiR&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQN0WzIBEfgw5B5a6jxT5LuF9u9K2wGeq4YFJKFpLbHZIQ&oe=6AC8F68B](https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/462849931_3691526741112272_3577002629415435246_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MDAuQzMifQ%3D%3D&_nc_ohc=OJFPu581IlAQ7kNvwEqdaMc&_nc_oc=AdrMozpQTKct9Vlcq_7e9pxkUgaR-6rl6ex6FMmVIrnrBk5oKuI_IkspgvHBuLiaSsIFLStSHr-KUo7SxStoJMiR&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQN0WzIBEfgw5B5a6jxT5LuF9u9K2wGeq4YFJKFpLbHZIQ&oe=6AC8F68B)",
-        "the solutions": "[https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/607521189_18549515326040892_7111381627807229689_n.jpg?_nc_cat=101&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=ViFTyZw6xqoQ7kNvwGRowbz&_nc_oc=AdqpTcsSugve9TwxqYGbJmqpLwEJ4lagblshr6ODs3Y1JCYoRE3ani3sPvj-CYFRQur9kj934BLtlXm6DV6Cgsci&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=y54yR721DcPL7cMHAAW3Zg&_nc_ss=79aaf&oh=00_AQO0F4X54FntxYTFdd_RTYMLLhou_xlC0G1utRnbdBXjEw&oe=6AC903C9](https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/607521189_18549515326040892_7111381627807229689_n.jpg?_nc_cat=101&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=ViFTyZw6xqoQ7kNvwGRowbz&_nc_oc=AdqpTcsSugve9TwxqYGbJmqpLwEJ4lagblshr6ODs3Y1JCYoRE3ani3sPvj-CYFRQur9kj934BLtlXm6DV6Cgsci&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=y54yR721DcPL7cMHAAW3Zg&_nc_ss=79aaf&oh=00_AQO0F4X54FntxYTFdd_RTYMLLhou_xlC0G1utRnbdBXjEw&oe=6AC903C9)",
-        "Crackshot": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/575999006_18327093628213524_2056025434013887360_n.jpg?_nc_cat=107&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=Nd12ipdBsZkQ7kNvwF1LoAY&_nc_oc=AdqXCy8tGTlLlNCq2Am40ImKSDVhGltIL3hAmsVUnM53OFNxKlrCm_Aal1HmdZc5voP579zMnbDV3HPpbNN5jhy0&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=EVNa-y1nn3QxM8hdlYApjg&_nc_ss=79aaf&oh=00_AQPAv3q_Bm4GXeChfTSB3pQbPZAQiiJy-wWXmYjx7AW57A&oe=6AC9003E](https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/575999006_18327093628213524_2056025434013887360_n.jpg?_nc_cat=107&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=Nd12ipdBsZkQ7kNvwF1LoAY&_nc_oc=AdqXCy8tGTlLlNCq2Am40ImKSDVhGltIL3hAmsVUnM53OFNxKlrCm_Aal1HmdZc5voP579zMnbDV3HPpbNN5jhy0&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=EVNa-y1nn3QxM8hdlYApjg&_nc_ss=79aaf&oh=00_AQPAv3q_Bm4GXeChfTSB3pQbPZAQiiJy-wWXmYjx7AW57A&oe=6AC9003E)",
-        "HYANG": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/671134329_17993391629950511_5093393119374614214_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=k_z6E2bxmCMQ7kNvwG8apMb&_nc_oc=AdqodBMJMj4uVUzVxkyz59no8NUCnUrUn4sR-tgqaRT6d-StkzYIleCH2ou4MxTxo8SEK5jwcUraPbkz2PmTFha6&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=xLTn0RoLU50BEPaXWOwctg&_nc_ss=79aaf&oh=00_AQN8zc75Dt82PR_2S1Zenrj5DAsAorERvIwJvJoaD1swZA&oe=6AC8FB22](https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/671134329_17993391629950511_5093393119374614214_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=k_z6E2bxmCMQ7kNvwG8apMb&_nc_oc=AdqodBMJMj4uVUzVxkyz59no8NUCnUrUn4sR-tgqaRT6d-StkzYIleCH2ou4MxTxo8SEK5jwcUraPbkz2PmTFha6&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=xLTn0RoLU50BEPaXWOwctg&_nc_ss=79aaf&oh=00_AQN8zc75Dt82PR_2S1Zenrj5DAsAorERvIwJvJoaD1swZA&oe=6AC8FB22)",
-        "WOODZ": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/624337327_17883796176442957_5934799896924143733_n.jpg?_nc_cat=104&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=Mb25TCkZo5sQ7kNvwHP73a7&_nc_oc=AdoSfLWTF-jlm7htqypAMcsV97SvXKiM51nIiHd1IkY2OyEwUbR3pWDO41nSvvsdyfcuaLZz8ME40xsIcEArcP52&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=H7i_rSOv2FfTpFK5euNQOg&_nc_ss=79aaf&oh=00_AQNk0xwI1GIEsLSsIYCP3LDkQ8-SYysjfJYMfL5PSXOMCQ&oe=6AC8F72A](https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/624337327_17883796176442957_5934799896924143733_n.jpg?_nc_cat=104&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=Mb25TCkZo5sQ7kNvwHP73a7&_nc_oc=AdoSfLWTF-jlm7htqypAMcsV97SvXKiM51nIiHd1IkY2OyEwUbR3pWDO41nSvvsdyfcuaLZz8ME40xsIcEArcP52&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=H7i_rSOv2FfTpFK5euNQOg&_nc_ss=79aaf&oh=00_AQNk0xwI1GIEsLSsIYCP3LDkQ8-SYysjfJYMfL5PSXOMCQ&oe=6AC8F72A)",
-        "gift": "[https://scontent-hkg4-2.cdninstagram.com/v/t51.2885-19/488075772_1669389710364690_1109588535201114385_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MDAuQzMifQ%3D%3D&_nc_ohc=eLRD-j9tZoMQ7kNvwGtzE7q&_nc_oc=AdrXqlaK7ffVfIo3MK7hexmPn-Td94tnRy3NGhg7NPxEePiiC8r1eFR1oTsK0bn1w2ADSpmqndDrNF9aG6xoZqqi&_nc_zt=24&_nc_ht=scontent-hkg4-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQMY4A_zAaowqgX9GZgtw2C9MTKQmGYdelORdS3pzjSU2w&oe=6AC8F0F5](https://scontent-hkg4-2.cdninstagram.com/v/t51.2885-19/488075772_1669389710364690_1109588535201114385_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MDAuQzMifQ%3D%3D&_nc_ohc=eLRD-j9tZoMQ7kNvwGtzE7q&_nc_oc=AdrXqlaK7ffVfIo3MK7hexmPn-Td94tnRy3NGhg7NPxEePiiC8r1eFR1oTsK0bn1w2ADSpmqndDrNF9aG6xoZqqi&_nc_zt=24&_nc_ht=scontent-hkg4-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQMY4A_zAaowqgX9GZgtw2C9MTKQmGYdelORdS3pzjSU2w&oe=6AC8F0F5)",
-        "The Rose": "[https://scontent-hkg1-1.cdninstagram.com/v/t51.2885-19/296901327_746991013175568_8680456622925936034_n.jpg?_nc_cat=109&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=9IBc6r2GAXQQ7kNvwEx2ZqO&_nc_oc=AdrWjuESzbSSnFxmIOriT-5qc_1YDwz-FdlS49GzTObEa-z27FwNV7ITDc5F8tPdA8zf8hQFsJoLQJmJp4hns_xC&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQPI6NB3wtE47_igi7AlyJ6AKuTgg5nmYChvrP0dQXzj8g&oe=6AC8F644](https://scontent-hkg1-1.cdninstagram.com/v/t51.2885-19/296901327_746991013175568_8680456622925936034_n.jpg?_nc_cat=109&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=9IBc6r2GAXQQ7kNvwEx2ZqO&_nc_oc=AdrWjuESzbSSnFxmIOriT-5qc_1YDwz-FdlS49GzTObEa-z27FwNV7ITDc5F8tPdA8zf8hQFsJoLQJmJp4hns_xC&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQPI6NB3wtE47_igi7AlyJ6AKuTgg5nmYChvrP0dQXzj8g&oe=6AC8F644)",
-        "W24": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/671217943_18356743537226788_5493525015073315537_n.jpg?_nc_cat=107&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy43NjcuQzMifQ%3D%3D&_nc_ohc=dSZ_cWtdovcQ7kNvwHeXyO2&_nc_oc=AdqppscY1oQZ8JRuoNYxqTz0IxF9wAL_q2nDNuNiluGSp_p6bklhjuy5ynfX1BiGhpUd3x7MpLOL038aRuBgA09Q&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=wdgz4HpKkEdSCzLOdm7Usg&_nc_ss=79aaf&oh=00_AQMR9MbJ4dwC4kA8dSwvsa-lvyg-ti6Lcoglv-DghQEuAQ&oe=6AC8E29D](https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/671217943_18356743537226788_5493525015073315537_n.jpg?_nc_cat=107&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy43NjcuQzMifQ%3D%3D&_nc_ohc=dSZ_cWtdovcQ7kNvwHeXyO2&_nc_oc=AdqppscY1oQZ8JRuoNYxqTz0IxF9wAL_q2nDNuNiluGSp_p6bklhjuy5ynfX1BiGhpUd3x7MpLOL038aRuBgA09Q&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=wdgz4HpKkEdSCzLOdm7Usg&_nc_ss=79aaf&oh=00_AQMR9MbJ4dwC4kA8dSwvsa-lvyg-ti6Lcoglv-DghQEuAQ&oe=6AC8E29D)",
-        "Lacuna": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.2885-19/322943164_467540408919247_1036790000520081958_n.jpg?_nc_cat=102&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy43OTkuQzMifQ%3D%3D&_nc_ohc=YH4RzrsFZMkQ7kNvwGdEtZl&_nc_oc=Adri29mgVV3WTgyKN6yPiwnei6M4Mx6g4kzzJaxb3WFOmRuqPTIdKgvutvaFF_NQhrx7DtKIYr14U2ZWZIt79CYy&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQMHeso53p__m6zV6si9W2hlYeqHKboJXpSyih73OnywqA&oe=6AC8ED86](https://scontent-hkg1-2.cdninstagram.com/v/t51.2885-19/322943164_467540408919247_1036790000520081958_n.jpg?_nc_cat=102&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy43OTkuQzMifQ%3D%3D&_nc_ohc=YH4RzrsFZMkQ7kNvwGdEtZl&_nc_oc=Adri29mgVV3WTgyKN6yPiwnei6M4Mx6g4kzzJaxb3WFOmRuqPTIdKgvutvaFF_NQhrx7DtKIYr14U2ZWZIt79CYy&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQMHeso53p__m6zV6si9W2hlYeqHKboJXpSyih73OnywqA&oe=6AC8ED86)",
-        "新人类": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/488375781_643292675127690_425901327735895078_n.jpg?_nc_cat=100&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy42MTkuQzMifQ%3D%3D&_nc_ohc=QLf4_ERS5MMQ7kNvwE5lQZM&_nc_oc=AdrVT_ssmnoAkXKsGJrSGia32htoaC3wQWRnJmy6IlKc3Y1_HObbsxkrp4ike8fAk9TtsY9KGPQ8uzkKc2dMTGLH&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQOI6mh_L7PW_IJvBAaY0dHbBcpR7VvvfLIFxZD00e4Y0Q&oe=6AC8EE72](https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/488375781_643292675127690_425901327735895078_n.jpg?_nc_cat=100&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy42MTkuQzMifQ%3D%3D&_nc_ohc=QLf4_ERS5MMQ7kNvwE5lQZM&_nc_oc=AdrVT_ssmnoAkXKsGJrSGia32htoaC3wQWRnJmy6IlKc3Y1_HObbsxkrp4ike8fAk9TtsY9KGPQ8uzkKc2dMTGLH&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQOI6mh_L7PW_IJvBAaY0dHbBcpR7VvvfLIFxZD00e4Y0Q&oe=6AC8EE72)",
-        "五月五日": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/725237267_18103302485323333_2887305426924596554_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=JkFgomtgFeoQ7kNvwEyntp9&_nc_oc=Ado692h2aOElgIZ3_8d0pHy14SkXp7OdYHBqz1PkxvneJMqzogEaT38dcGYZVcQbKE5PVxcl0kA-0PWLrc7FrPEo&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=17NihZwjtkc1oqY_Ysb4Xw&_nc_ss=79aaf&oh=00_AQNv3elXXsitM97dgSN9RYqXl-UvRPTQhH45ncdaYDostg&oe=6AC9027C](https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/725237267_18103302485323333_2887305426924596554_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=JkFgomtgFeoQ7kNvwEyntp9&_nc_oc=Ado692h2aOElgIZ3_8d0pHy14SkXp7OdYHBqz1PkxvneJMqzogEaT38dcGYZVcQbKE5PVxcl0kA-0PWLrc7FrPEo&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=17NihZwjtkc1oqY_Ysb4Xw&_nc_ss=79aaf&oh=00_AQNv3elXXsitM97dgSN9RYqXl-UvRPTQhH45ncdaYDostg&oe=6AC9027C)",
-        "ANARKI CULTURE": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/809226072_18115443265940937_2121437436469955084_n.jpg?_nc_cat=106&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy45NTkuQzMifQ%3D%3D&_nc_ohc=5gOjL60hh_EQ7kNvwEMjRR-&_nc_oc=AdqitW2RYodxlF2wHqct4bmF2_5ZyCDS1Uy9JFcXF2Kx4-s7Nhsq-MLf2n9s_kTU2MDOH9a1SQZXpPiQavs4EP2s&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=ngOYgTodmYPmkn2Z8FROOw&_nc_ss=79aaf&oh=00_AQP6qBuXRF6-ICe9m5Gam8fkdCEnq3pVWqcQMwP2_wQjcg&oe=6AC8E6C4](https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/809226072_18115443265940937_2121437436469955084_n.jpg?_nc_cat=106&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy45NTkuQzMifQ%3D%3D&_nc_ohc=5gOjL60hh_EQ7kNvwEMjRR-&_nc_oc=AdqitW2RYodxlF2wHqct4bmF2_5ZyCDS1Uy9JFcXF2Kx4-s7Nhsq-MLf2n9s_kTU2MDOH9a1SQZXpPiQavs4EP2s&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=ngOYgTodmYPmkn2Z8FROOw&_nc_ss=79aaf&oh=00_AQP6qBuXRF6-ICe9m5Gam8fkdCEnq3pVWqcQMwP2_wQjcg&oe=6AC8E6C4)",
-        "87dance": "[https://scontent-hkg4-2.cdninstagram.com/v/t51.2885-19/441745583_962036721860658_939638055732713283_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy44MTAuQzMifQ%3D%3D&_nc_ohc=tBJ1ABodGC0Q7kNvwEMH3bU&_nc_oc=AdrN4G_NMl8Cbe2C2yOylN5AQSecwt9CC7NusE9pgnwv9v7o2dJCLgO_UsBwd0m8jl_Mt3rJMuqiUTAp6i9Wjchr&_nc_zt=24&_nc_ht=scontent-hkg4-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQOICb_m4wOTNdDR1OWkZGMjFOLjzeiansxgEnxroC2L_Q&oe=6AC8E0AB](https://scontent-hkg4-2.cdninstagram.com/v/t51.2885-19/441745583_962036721860658_939638055732713283_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy44MTAuQzMifQ%3D%3D&_nc_ohc=tBJ1ABodGC0Q7kNvwEMH3bU&_nc_oc=AdrN4G_NMl8Cbe2C2yOylN5AQSecwt9CC7NusE9pgnwv9v7o2dJCLgO_UsBwd0m8jl_Mt3rJMuqiUTAp6i9Wjchr&_nc_zt=24&_nc_ht=scontent-hkg4-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQOICb_m4wOTNdDR1OWkZGMjFOLjzeiansxgEnxroC2L_Q&oe=6AC8E0AB)",
-        "HEYMEN": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/627648117_18506018440073571_1337274447432669206_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=3WRNIkZD1owQ7kNvwEGxZCr&_nc_oc=AdrFxndvDy33oKkBPzPvN9o014SS3laDqBux91d3d8hiWqVzJ4mAYpSC9HDKPk4r3XjsxY9kFhLK5aeVJYQkbkzZ&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=eEowZVA5eybWIhcOxjUdqA&_nc_ss=79aaf&oh=00_AQMa2OrC_u5XULoUvcmzGIVzKVn1NGAO8cjV2WU1Kat2SA&oe=6AC8FF2E](https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/627648117_18506018440073571_1337274447432669206_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=3WRNIkZD1owQ7kNvwEGxZCr&_nc_oc=AdrFxndvDy33oKkBPzPvN9o014SS3laDqBux91d3d8hiWqVzJ4mAYpSC9HDKPk4r3XjsxY9kFhLK5aeVJYQkbkzZ&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=eEowZVA5eybWIhcOxjUdqA&_nc_ss=79aaf&oh=00_AQMa2OrC_u5XULoUvcmzGIVzKVn1NGAO8cjV2WU1Kat2SA&oe=6AC8FF2E)",
-        "ONDO": "[https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/649048154_18088673525137973_5548777035174436208_n.jpg?_nc_cat=109&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=1a0_I8sQo3wQ7kNvwFW_oQ5&_nc_oc=AdquDoyUm_QN7gE8CMKY8VLMWIoyvMnRa4VnkYFGBnDJJa_GW6ar61nCLU2g1FW_PIm5SeU4cK2LF-FF9b-lDcvu&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=3WnRRWWssqHwrLt-dZElFA&_nc_ss=79aaf&oh=00_AQO0sbOCdGNvfstdkqoBi8_pqkDHhFDJSh--uw_eIn-4lg&oe=6AC8E9EC](https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/649048154_18088673525137973_5548777035174436208_n.jpg?_nc_cat=109&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=1a0_I8sQo3wQ7kNvwFW_oQ5&_nc_oc=AdquDoyUm_QN7gE8CMKY8VLMWIoyvMnRa4VnkYFGBnDJJa_GW6ar61nCLU2g1FW_PIm5SeU4cK2LF-FF9b-lDcvu&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=3WnRRWWssqHwrLt-dZElFA&_nc_ss=79aaf&oh=00_AQO0sbOCdGNvfstdkqoBi8_pqkDHhFDJSh--uw_eIn-4lg&oe=6AC8E9EC)",
-        "MGFF": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.75761-19/497503558_18384987034140658_2807057112157319913_n.jpg?_nc_cat=103&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=iz2OuT3zTO0Q7kNvwEUMzq4&_nc_oc=AdriQoBiYNQSpNaExs-0WCGD6tJ85A7Po_oDIBnvtlT8k3CWoOWfgwGLugdoMUtvclcljeRooosZnOrhuf_eTr6Y&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=USL4Eq_kQTmCnDv7WhUslQ&_nc_ss=79aaf&oh=00_AQMa89_Fud_adQ3U4leVffKF9E0mCGAaFCD6YQkOu_PeVA&oe=6AC8F3F3](https://scontent-hkg1-2.cdninstagram.com/v/t51.75761-19/497503558_18384987034140658_2807057112157319913_n.jpg?_nc_cat=103&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=iz2OuT3zTO0Q7kNvwEUMzq4&_nc_oc=AdriQoBiYNQSpNaExs-0WCGD6tJ85A7Po_oDIBnvtlT8k3CWoOWfgwGLugdoMUtvclcljeRooosZnOrhuf_eTr6Y&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=USL4Eq_kQTmCnDv7WhUslQ&_nc_ss=79aaf&oh=00_AQMa89_Fud_adQ3U4leVffKF9E0mCGAaFCD6YQkOu_PeVA&oe=6AC8F3F3)",
-        "TOUCHED": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/467049785_984615993682195_5211760417273831578_n.jpg?_nc_cat=108&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=e1uXTRyIH9IQ7kNvwFlj0j_&_nc_oc=Adqjn5wwuClNYWvHeeQqsisGII3eVVaOlnNPv1Y7zq7_xNz9nObgaZ9y8EsRxCENK4_cIA3u2ZJMc4YV1RHdd8dI&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQPo7xSCx3Kw0c3ld2BWkSBM3BSObgTcqk29theQjqJZbw&oe=6AC90700](https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/467049785_984615993682195_5211760417273831578_n.jpg?_nc_cat=108&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=e1uXTRyIH9IQ7kNvwFlj0j_&_nc_oc=Adqjn5wwuClNYWvHeeQqsisGII3eVVaOlnNPv1Y7zq7_xNz9nObgaZ9y8EsRxCENK4_cIA3u2ZJMc4YV1RHdd8dI&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQPo7xSCx3Kw0c3ld2BWkSBM3BSObgTcqk29theQjqJZbw&oe=6AC90700)",
-        "MOWS": "[https://scontent-hkg1-1.cdninstagram.com/v/t51.2885-19/495450708_1186662449808504_1597366084697290111_n.jpg?_nc_cat=105&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=T6skqoGG96IQ7kNvwHt47BA&_nc_oc=AdrUrohuHeDEh2V0FAwsCjzkvv7DfDTbMtyOan-davD3sXNuRbPDl-FsId47b3XuETE061jVXNNjj-uwYio9t2Y7&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQMIBD3uCJf-BrYvcgY4zMxBNVZUCzlIkgdo90eskTM7_w&oe=6AC913E7](https://scontent-hkg1-1.cdninstagram.com/v/t51.2885-19/495450708_1186662449808504_1597366084697290111_n.jpg?_nc_cat=105&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=T6skqoGG96IQ7kNvwHt47BA&_nc_oc=AdrUrohuHeDEh2V0FAwsCjzkvv7DfDTbMtyOan-davD3sXNuRbPDl-FsId47b3XuETE061jVXNNjj-uwYio9t2Y7&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQMIBD3uCJf-BrYvcgY4zMxBNVZUCzlIkgdo90eskTM7_w&oe=6AC913E7)",
-        "PATZ": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.2885-19/466785069_1038434578032026_5234799624442159697_n.jpg?_nc_cat=102&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=T1cGOipfpMwQ7kNvwEpxrwJ&_nc_oc=Adr9KiT6WCdSD9rOYWKRkfXtrSIZdIPqQD0Zrnkp2Av8i4ltEhBgGqTqh6IQLNv5cHhERh_yy9StfTcjdAFV1Y8C&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQN0K7zpz2zdJoHidXk9fHqLRhR3GZPaMmZXqp6WiiwQqw&oe=6AC909AB](https://scontent-hkg1-2.cdninstagram.com/v/t51.2885-19/466785069_1038434578032026_5234799624442159697_n.jpg?_nc_cat=102&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=T1cGOipfpMwQ7kNvwEpxrwJ&_nc_oc=Adr9KiT6WCdSD9rOYWKRkfXtrSIZdIPqQD0Zrnkp2Av8i4ltEhBgGqTqh6IQLNv5cHhERh_yy9StfTcjdAFV1Y8C&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_ss=79aaf&oh=00_AQN0K7zpz2zdJoHidXk9fHqLRhR3GZPaMmZXqp6WiiwQqw&oe=6AC909AB)",
-        "紫雨林": "[https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkVMTm_8qCC-L2QEuNSq31jv3N2kbIWoUYaaNuJIYNaA&s=10](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkVMTm_8qCC-L2QEuNSq31jv3N2kbIWoUYaaNuJIYNaA&s=10)",
-        "Noa Coast": "[https://scontent-hkg4-2.cdninstagram.com/v/t51.82787-19/523986408_17888664489315262_2326347509979240552_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDAwLkMzIn0%3D&_nc_ohc=koc6ruEq7WAQ7kNvwEefUNw&_nc_oc=Adra3QPt7Ek_BE3JfILrRl5nK61HbfzB8Mtg3nSMyMsfbFu9BRV8aK1LnmrvZfURs9ChKU8EvFcTgORsEyeraFn_&_nc_zt=24&_nc_ht=scontent-hkg4-2.cdninstagram.com&_nc_gid=Hm9nV7aADiIQzIH3SxX4uA&_nc_ss=79aaf&oh=00_AQORr_HWp9zryR5MlK8TEwc1DxvPvueFYVDAoNM028V7xA&oe=6AC911D7](https://scontent-hkg4-2.cdninstagram.com/v/t51.82787-19/523986408_17888664489315262_2326347509979240552_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDAwLkMzIn0%3D&_nc_ohc=koc6ruEq7WAQ7kNvwEefUNw&_nc_oc=Adra3QPt7Ek_BE3JfILrRl5nK61HbfzB8Mtg3nSMyMsfbFu9BRV8aK1LnmrvZfURs9ChKU8EvFcTgORsEyeraFn_&_nc_zt=24&_nc_ht=scontent-hkg4-2.cdninstagram.com&_nc_gid=Hm9nV7aADiIQzIH3SxX4uA&_nc_ss=79aaf&oh=00_AQORr_HWp9zryR5MlK8TEwc1DxvPvueFYVDAoNM028V7xA&oe=6AC911D7)",
-        "FuturePeerClub": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/742951630_17910346221430690_3304445466825074774_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=Ii-KoldiqnIQ7kNvwFT0uGB&_nc_oc=Adq-GqGqhNZDIzrZF5bfd2JruLiT7ssEm_Us3-hDvOQTNwkYR7nxfpQ_oIm2xkvqv0xYitZ6xWIs67wltYAwocYh&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=cZlZbxMXzijkZZ4brPqiOA&_nc_ss=79aaf&oh=00_AQN2_AcZ1RNAFeltW6FS3CVsQLRs3q4Rp8q04vKP9K4LMQ&oe=6AC91010](https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/742951630_17910346221430690_3304445466825074774_n.jpg?_nc_cat=110&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=Ii-KoldiqnIQ7kNvwFT0uGB&_nc_oc=Adq-GqGqhNZDIzrZF5bfd2JruLiT7ssEm_Us3-hDvOQTNwkYR7nxfpQ_oIm2xkvqv0xYitZ6xWIs67wltYAwocYh&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=cZlZbxMXzijkZZ4brPqiOA&_nc_ss=79aaf&oh=00_AQN2_AcZ1RNAFeltW6FS3CVsQLRs3q4Rp8q04vKP9K4LMQ&oe=6AC91010)",
-        "KYUDO": "[https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/528641230_17911599594180325_4804354680642143450_n.jpg?_nc_cat=109&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy43NTEuQzMifQ%3D%3D&_nc_ohc=gihW5rv1T4EQ7kNvwEyehZj&_nc_oc=Adp9puugjDXU7fkx9jaxdU1xhPGlO7hF9ZpCD4GhIQowSodvyR0IehVPv9eHosux-yuWssk8gXDJs_6-KlY50jpc&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=CDNPbdbCaqc8dn7CN5n9Qw&_nc_ss=79aaf&oh=00_AQP9ukt_TiPyTr6CQh3WDKqbQY4EZ8NuTR78AcRrihEh7w&oe=6AC8FD40](https://scontent-hkg1-1.cdninstagram.com/v/t51.82787-19/528641230_17911599594180325_4804354680642143450_n.jpg?_nc_cat=109&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy43NTEuQzMifQ%3D%3D&_nc_ohc=gihW5rv1T4EQ7kNvwEyehZj&_nc_oc=Adp9puugjDXU7fkx9jaxdU1xhPGlO7hF9ZpCD4GhIQowSodvyR0IehVPv9eHosux-yuWssk8gXDJs_6-KlY50jpc&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_gid=CDNPbdbCaqc8dn7CN5n9Qw&_nc_ss=79aaf&oh=00_AQP9ukt_TiPyTr6CQh3WDKqbQY4EZ8NuTR78AcRrihEh7w&oe=6AC8FD40)",
-        "FRankly": "[https://scontent-hkg1-1.cdninstagram.com/v/t51.2885-19/404896036_1018090545944150_5437373953842025870_n.jpg?_nc_cat=105&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=bqHyl9f12GwQ7kNvwHh3-0D&_nc_oc=AdpbJ3R0JiefNQ4yHNwE66PvGeNtmH_z2HaC3RhnAmScy3IrUn7Vaf4tQlSYL4Tat9I2nipdqr5bGPB6g7fgRDfd&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQP7F7LnOiBYHl2mbe4ic0EvMCGq7aZ8sRlwan-yoatU-g&oe=6AC90658](https://scontent-hkg1-1.cdninstagram.com/v/t51.2885-19/404896036_1018090545944150_5437373953842025870_n.jpg?_nc_cat=105&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=bqHyl9f12GwQ7kNvwHh3-0D&_nc_oc=AdpbJ3R0JiefNQ4yHNwE66PvGeNtmH_z2HaC3RhnAmScy3IrUn7Vaf4tQlSYL4Tat9I2nipdqr5bGPB6g7fgRDfd&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQP7F7LnOiBYHl2mbe4ic0EvMCGq7aZ8sRlwan-yoatU-g&oe=6AC90658)",
-        "igloobay": "[https://scontent-hkg4-2.cdninstagram.com/v/t51.82787-19/711601709_18424653631133386_5331885500617076456_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy45MDAuQzMifQ%3D%3D&_nc_ohc=cSb38d8tPZsQ7kNvwGh3Tp1&_nc_oc=AdoY-P3rT4wfQplQa0QxCOU7lZNmwRWak35ar_PdGT7O2OIcwQo0CJBq0knltIQ2z7u7Es5dF18WWTP3kcNXsAw7&_nc_zt=24&_nc_ht=scontent-hkg4-2.cdninstagram.com&_nc_gid=NJHy4yj5RiAQMLO1NFgWxw&_nc_ss=79aaf&oh=00_AQNiE_oYGjSUIJ24mCDww4yjRfSSOnT1UjatDJ1zceMw2w&oe=6AC8E5A9](https://scontent-hkg4-2.cdninstagram.com/v/t51.82787-19/711601709_18424653631133386_5331885500617076456_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy45MDAuQzMifQ%3D%3D&_nc_ohc=cSb38d8tPZsQ7kNvwGh3Tp1&_nc_oc=AdoY-P3rT4wfQplQa0QxCOU7lZNmwRWak35ar_PdGT7O2OIcwQo0CJBq0knltIQ2z7u7Es5dF18WWTP3kcNXsAw7&_nc_zt=24&_nc_ht=scontent-hkg4-2.cdninstagram.com&_nc_gid=NJHy4yj5RiAQMLO1NFgWxw&_nc_ss=79aaf&oh=00_AQNiE_oYGjSUIJ24mCDww4yjRfSSOnT1UjatDJ1zceMw2w&oe=6AC8E5A9)",
-        "sanbo": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/616819138_17920069449238399_9064621585014227609_n.jpg?_nc_cat=106&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy40NDcuQzMifQ%3D%3D&_nc_ohc=qEUqA04O39gQ7kNvwFeI1nO&_nc_oc=AdrMEO-tjJvngrFBueEaFSaq8iWc_XGJBSOJzxOrGJesX436F7HzOMj_daowOLK2_N1a8UAfnkzYPyBn2TfhI_fX&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=cumsizYnwDUBzo2N-pJhLg&_nc_ss=79aaf&oh=00_AQMfIA89U0nutrsiwMS_SZ_058FEXlTgA2UJuiY0VNc_kg&oe=6AC9125A](https://scontent-hkg4-1.cdninstagram.com/v/t51.82787-19/616819138_17920069449238399_9064621585014227609_n.jpg?_nc_cat=106&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy40NDcuQzMifQ%3D%3D&_nc_ohc=qEUqA04O39gQ7kNvwFeI1nO&_nc_oc=AdrMEO-tjJvngrFBueEaFSaq8iWc_XGJBSOJzxOrGJesX436F7HzOMj_daowOLK2_N1a8UAfnkzYPyBn2TfhI_fX&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_gid=cumsizYnwDUBzo2N-pJhLg&_nc_ss=79aaf&oh=00_AQMfIA89U0nutrsiwMS_SZ_058FEXlTgA2UJuiY0VNc_kg&oe=6AC9125A)",
-        "KYSB": "[https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/805579586_18115129618789456_2184606672665792821_n.jpg?_nc_cat=107&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=POar_FhTJQ4Q7kNvwGlxcYJ&_nc_oc=AdrXiMIy9EoMao_pgVNOQbqgAXWnGSq7nZIvUZNjGX0KTVK7u8Q7PLZJgMh_BbQTBD7N6B2P4-_0T-L7lGm69pkU&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=1K3NCzMtJMkMbhPp3O1zUw&_nc_ss=79aaf&oh=00_AQO2E3o3dT3hi5_wDRsuyX5a0thTwCBb9_gsDR8geP5xQg&oe=6AC91108](https://scontent-hkg1-2.cdninstagram.com/v/t51.82787-19/805579586_18115129618789456_2184606672665792821_n.jpg?_nc_cat=107&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=POar_FhTJQ4Q7kNvwGlxcYJ&_nc_oc=AdrXiMIy9EoMao_pgVNOQbqgAXWnGSq7nZIvUZNjGX0KTVK7u8Q7PLZJgMh_BbQTBD7N6B2P4-_0T-L7lGm69pkU&_nc_zt=24&_nc_ht=scontent-hkg1-2.cdninstagram.com&_nc_gid=1K3NCzMtJMkMbhPp3O1zUw&_nc_ss=79aaf&oh=00_AQO2E3o3dT3hi5_wDRsuyX5a0thTwCBb9_gsDR8geP5xQg&oe=6AC91108)",
-        "Jannabi": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/485367142_29234844829434152_5356409868566296688_n.jpg?_nc_cat=100&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=d8ec0vKRTV8Q7kNvwHY-3nY&_nc_oc=Adp3PZ2eWSRIwQP0-l-e5KFgkC2rVy7Cz_MsaIUmsBkAxFVDUwI9mxeWT1MPMGIOA-V5XJ1ebm0VSzhWC9zzvgx0&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQM1xA58E-KxA0W-2Lb4JmPaYuhV4Vjn8vyP4FWNhaGQig&oe=6AC8E6A2](https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/485367142_29234844829434152_5356409868566296688_n.jpg?_nc_cat=100&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=d8ec0vKRTV8Q7kNvwHY-3nY&_nc_oc=Adp3PZ2eWSRIwQP0-l-e5KFgkC2rVy7Cz_MsaIUmsBkAxFVDUwI9mxeWT1MPMGIOA-V5XJ1ebm0VSzhWC9zzvgx0&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQM1xA58E-KxA0W-2Lb4JmPaYuhV4Vjn8vyP4FWNhaGQig&oe=6AC8E6A2)",
-        "wave to earth": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/319920045_809819426983689_5942561889074799528_n.jpg?_nc_cat=1&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=aIOCX3AQF-MQ7kNvwG23bcv&_nc_oc=AdqlScS6Z-llH5TMTuszk0G1htYaGhUGGz0ArnrVOfeDKZ5W2RaZddScePHSmn-b4kg2OadUCEQlc33Gw8lP8eRD&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQM-FI18CyLDkuLEtGUaPpS6Z4NgdK78YarvLGG3zeoOYA&oe=6AC8EBF4](https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/319920045_809819426983689_5942561889074799528_n.jpg?_nc_cat=1&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=aIOCX3AQF-MQ7kNvwG23bcv&_nc_oc=AdqlScS6Z-llH5TMTuszk0G1htYaGhUGGz0ArnrVOfeDKZ5W2RaZddScePHSmn-b4kg2OadUCEQlc33Gw8lP8eRD&_nc_zt=24&_nc_ht=scontent-hkg4-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQM-FI18CyLDkuLEtGUaPpS6Z4NgdK78YarvLGG3zeoOYA&oe=6AC8EBF4)",
-        "The Poles": "[https://scontent-hkg1-1.cdninstagram.com/v/t51.2885-19/446099758_735973825278889_7497587440376291584_n.jpg?_nc_cat=101&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=m3Z3w4j_MegQ7kNvwHkpqOU&_nc_oc=AdoIvzPmLzmXoKlIzNUuuU-JCVbEtnO10t-ez4rW_PZsJsWxRJnEBCEYC67LYPg5hxti3bL_UrDO9n-FX8qjjM2L&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQOqdregxchQROXdBp34B-yq8aGK-MDgctVD8MVaxVwu_Q&oe=6AC914EF](https://scontent-hkg1-1.cdninstagram.com/v/t51.2885-19/446099758_735973825278889_7497587440376291584_n.jpg?_nc_cat=101&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=m3Z3w4j_MegQ7kNvwHkpqOU&_nc_oc=AdoIvzPmLzmXoKlIzNUuuU-JCVbEtnO10t-ez4rW_PZsJsWxRJnEBCEYC67LYPg5hxti3bL_UrDO9n-FX8qjjM2L&_nc_zt=24&_nc_ht=scontent-hkg1-1.cdninstagram.com&_nc_ss=79aaf&oh=00_AQOqdregxchQROXdBp34B-yq8aGK-MDgctVD8MVaxVwu_Q&oe=6AC914EF)",
-        "YDBB": "[https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/445392890_756981969913256_7501357011451873415_n.jpg?_nc_cat=100&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy44OTAuQzMifQ%3D](https://scontent-hkg4-1.cdninstagram.com/v/t51.2885-19/445392890_756981969913256_7501357011451873415_n.jpg?_nc_cat=100&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy44OTAuQzMifQ%3D)",
-        "SURL": "[http://t.cn/AXW1yUwb](http://t.cn/AXW1yUwb)",
-        "Balming Tiger": "[http://t.cn/AXW1yUw4](http://t.cn/AXW1yUw4)",
-        "Parannoul": "[http://t.cn/AXW1yUwU](http://t.cn/AXW1yUwU)",
-        "offthemenu": "[http://t.cn/AXW1yUwG](http://t.cn/AXW1yUwG)"
-    };
-
-    const rawBands = [
-        "DAY6", "QWER", "Xdinary Heroes", "FTIsland", "CNBLUE", "N.Flying", "AxMxP", "ONEWE", "LUCY",
-        "splayit", "hrtz.wav", "HiFi-Unicorn", "catch the young", "V01D", "Chrocktikal", "Dragon Pony",
-        "skipjack", "DADADA", "Redoor", "creespy", "The Fix", "KARDI", "NerdConnection", "Can't be blue",
-        "Tokai", "simileland", "Silicagel", "Far east asian tigers", "RedC", "leeparan", "李承允", "POSER",
-        "NELL", "crying nut", "NoBrain", "bluhwa", "jisokuryclub", "blueisnotblue", "dabda", "sonlmor",
-        "喜鹊山", "illuvan", "HANRORO", "TuesdayBeachClub", "DamonsYear", "Adios Audio", "THORNAPPLE",
-        "ConfinedWhite", "Broken Valentine", "gogohawk", "hanroro", "PEPPERTONES", "YB", "the solutions",
-        "Crackshot", "HYANG", "WOODZ", "gift", "The Rose", "W24", "Lacuna", "新人类", "五月五日",
-        "ANARKI CULTURE", "87dance", "HEYMEN", "ONDO", "MGFF", "TOUCHED", "MOWS", "PATZ", "紫雨林",
-        "Noa Coast", "FuturePeerClub", "KYUDO", "FRankly", "igloobay", "sanbo", "KYSB", "Jannabi",
-        "wave to earth", "The Poles", "YDBB", "SURL", "Balming Tiger", "Parannoul", "offthemenu"
-    ];
-
-    function getBandImage(name) {
-        if (defaultCustomImages[name]) {
-            return defaultCustomImages[name];
-        }
-        return `[https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80](https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80)`;
-    }
-
-    let bandsData = rawBands.map(name => ({
-        name: name,
-        score: 0,
-        appearances: 0,
-        votes: 0
-    }));
-
-    document.getElementById('total-bands-count').innerText = bandsData.length;
-
-    let tournamentStages = [];
-    let currentStageIndex = 0;
-    let currentGroupBands = [];
-    let requiredSelectNum = 3;
-    let userSelectedNames = new Set();
-
-    function startSelection() {
-        bandsData.forEach(b => { b.score = 0; b.appearances = 0; b.votes = 0; });
-        tournamentStages = generateTournamentSchedule(bandsData);
-        currentStageIndex = 0;
-        document.getElementById('welcome-screen').classList.add('hidden');
-        document.getElementById('voting-screen').classList.remove('hidden');
-        loadGroup();
-    }
-
-    function generateTournamentSchedule(allBands) {
-        let schedule = [];
-        let pool = [];
-        allBands.forEach(b => {
-            pool.push(b.name);
-            pool.push(b.name);
-            pool.push(b.name);
-        });
-        pool.sort(() => Math.random() - 0.5);
-
-        while (pool.length >= 9) {
-            let groupNames = pool.splice(0, 9);
-            groupNames = [...new Set(groupNames)];
-            while (groupNames.length < 9) {
-                let randomBand = allBands[Math.floor(Math.random() * allBands.length)].name;
-                if (!groupNames.includes(randomBand)) {
-                    groupNames.push(randomBand);
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>韩国乐队最爱 Top 9 分组晋级决选器</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fdf4f8',
+                            500: '#ec4899',
+                            600: '#db2777',
+                            900: '#831843',
+                        }
+                    }
                 }
             }
-            schedule.push({
-                type: '9-to-3',
-                bands: groupNames,
-                selectNum: 3,
-                title: '第一阶段：9 选 3 小组海选'
-            });
         }
-
-        for (let i = 0; i < 15; i++) {
-            let shuffled = [...allBands].sort(() => Math.random() - 0.5);
-            let groupNames = shuffled.slice(0, 6).map(b => b.name);
-            schedule.push({
-                type: '6-to-3',
-                bands: groupNames,
-                selectNum: 3,
-                title: '第二阶段：6 选 3 深度复赛'
-            });
+    </script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;750;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+            background-color: #0f0f13;
+            color: #f4f4f5;
         }
-
-        for (let i = 0; i < 10; i++) {
-            let shuffled = [...allBands].sort(() => Math.random() - 0.5);
-            let groupNames = shuffled.slice(0, 2).map(b => b.name);
-            schedule.push({
-                type: '2-to-1',
-                bands: groupNames,
-                selectNum: 1,
-                title: '第三阶段：2 选 1 巅峰对决'
-            });
+        .glass-panel {
+            background: rgba(24, 24, 27, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-
-        return schedule;
-    }
-
-    function loadGroup() {
-        if (currentStageIndex >= tournamentStages.length) {
-            showResults();
-            return;
+        .card-hover {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px -8px rgba(236, 72, 153, 0.3);
+            border-color: rgba(236, 72, 153, 0.5);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f0f13;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-pink-500 selection:text-white">
 
-        const currentStage = tournamentStages[currentStageIndex];
-        currentGroupBands = currentStage.bands.map(name => bandsData.find(b => b.name === name));
-        requiredSelectNum = currentStage.selectNum;
-        userSelectedNames.clear();
-
-        document.getElementById('stage-title').innerText = currentStage.title;
-        document.getElementById('stage-desc').innerHTML = `请从下列乐队中精准选出你最喜欢的 <span class="text-pink-400 font-bold">${requiredSelectNum}</span> 个`;
-        document.getElementById('pick-target-num').innerText = requiredSelectNum;
-        document.getElementById('max-select-count').innerText = requiredSelectNum;
-        document.getElementById('round-indicator').innerText = `阶段进度 ${currentStageIndex + 1} / ${tournamentStages.length}`;
-        
-        const progress = ((currentStageIndex + 1) / tournamentStages.length) * 100;
-        document.getElementById('progress-bar').style.width = `${progress}%`;
-
-        currentGroupBands.forEach(b => b.appearances++);
-
-        renderGroupCards();
-        updateNextButtonState();
-    }
-
-    function renderGroupCards() {
-        const grid = document.getElementById('candidates-grid');
-        grid.innerHTML = '';
-        grid.className = currentGroupBands.length === 2 ? "grid grid-cols-2 gap-4 mb-8 max-w-lg mx-auto" : "grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8";
-
-        currentGroupBands.forEach(band => {
-            const isSelected = userSelectedNames.has(band.name);
-            const card = document.createElement('div');
-            card.className = `cursor-pointer rounded-xl p-3 border transition-all duration-200 flex flex-col items-center text-center relative overflow-hidden group ${
-                isSelected 
-                    ? 'bg-purple-950/40 border-pink-500 neon-glow ring-2 ring-pink-500/50' 
-                    : 'bg-stone-900/80 border-stone-800 hover:border-stone-700'
-            }`;
-            card.onclick = () => toggleSelect(band.name);
-
-            const imgUrl = getBandImage(band.name);
-
-            card.innerHTML = `
-                <div class="absolute top-2 right-2 w-5 h-5 rounded-full border border-stone-600 flex items-center justify-center text-xs transition ${
-                    isSelected ? 'bg-pink-500 border-pink-500 text-white font-bold' : 'bg-stone-900/60 text-transparent'
-                }">✓</div>
-                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden mb-3 bg-stone-800 relative">
-                    <img src="${imgUrl}" alt="${band.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='[https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80](https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80)'">
+    <!-- Header -->
+    <header class="w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-600 to-purple-600 flex items-center justify-center shadow-lg shadow-pink-600/30">
+                    <i class="fa-solid fa-guitar text-white text-lg"></i>
                 </div>
-                <h4 class="font-bold text-sm text-stone-100 line-clamp-1 w-full px-1">${band.name}</h4>
-            `;
-            grid.appendChild(card);
-        });
-    }
+                <div>
+                    <h1 class="font-black tracking-wider text-lg sm:text-xl bg-gradient-to-r from-white via-pink-200 to-pink-500 bg-clip-text text-transparent">
+                        K-INDIE STAGE RANKER
+                    </h1>
+                    <p class="text-xs text-zinc-400 font-medium">分阶段多选晋级 · 科学甄选 Top 9</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <button onclick="openCustomizerModal()" class="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 text-zinc-200 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-sliders text-pink-500"></i>
+                    <span class="hidden sm:inline">管理/自定义乐队图片</span>
+                </button>
+                <div class="text-xs font-medium px-3 py-1.5 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20">
+                    <span id="header-band-count">92</span> 组乐队
+                </div>
+            </div>
+        </div>
+    </header>
 
-    function toggleSelect(name) {
-        if (userSelectedNames.has(name)) {
-            userSelectedNames.delete(name);
-        } else {
-            if (userSelectedNames.size >= requiredSelectNum) {
-                let firstItem = userSelectedNames.values().next().value;
-                userSelectedNames.delete(firstItem);
-            }
-            userSelectedNames.add(name);
+    <!-- Main Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col justify-center">
+
+        <!-- VIEW 1: WELCOME SCREEN -->
+        <div id="view-welcome" class="space-y-8 py-6">
+            <div class="text-center space-y-4 max-w-2xl mx-auto">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-400 border border-pink-500/30">
+                    <i class="fa-solid fa-layer-group text-pink-500"></i> 科学多阶段晋级机制 (9选3 ➔ 6选3 ➔ 巅峰决选)
+                </span>
+                <h2 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
+                    定制你的韩国乐队<span class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">终极 Top 9</span>
+                </h2>
+                <p class="text-zinc-400 text-sm sm:text-base">
+                    包含 DAY6, QWER, Silicagel, Jannabi, YB 等超90组全明星阵容。我们将通过分组“9选3”小组赛、“6选3”半决赛以及巅峰2选1微调，科学层层筛选出你心中的前9名本命乐队！
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto pt-4">
+                <div class="glass-panel p-5 rounded-2xl text-center space-y-2">
+                    <div class="w-10 h-10 mx-auto rounded-full bg-pink-500/10 flex items-center justify-center text-pink-400 text-lg">
+                        <i class="fa-solid fa-th-large"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-sm">第一轮：9选3小组赛</h3>
+                    <p class="text-xs text-zinc-400">将超90组乐队分为多组，每组 9 选出最爱的 3 组晋级</p>
+                </div>
+                <div class="glass-panel p-5 rounded-2xl text-center space-y-2">
+                    <div class="w-10 h-10 mx-auto rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400 text-lg">
+                        <i class="fa-solid fa-filter"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-sm">第二轮：6选3半决赛</h3>
+                    <p class="text-xs text-zinc-400">晋级乐队重新混编为 6 组，每组再精选出 3 组强强对抗</p>
+                </div>
+                <div class="glass-panel p-5 rounded-2xl text-center space-y-2">
+                    <div class="w-10 h-10 mx-auto rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-lg">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-sm">决赛轮：决胜 Top 9</h3>
+                    <p class="text-xs text-zinc-400">锁定最终 9 强并进行 2选1 微调排序，生成专属海报</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+                <button onclick="startStageProcess()" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-pink-600 via-pink-500 to-purple-600 text-white font-bold text-lg shadow-xl shadow-pink-600/30 hover:shadow-pink-600/50 hover:scale-[1.02] active:scale-95 transition flex items-center justify-center space-x-3">
+                    <i class="fa-solid fa-play"></i>
+                    <span>开始分阶段甄选</span>
+                </button>
+                <button onclick="openCustomizerModal()" class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-zinc-900 border border-zinc-700 text-zinc-300 font-semibold text-base hover:bg-zinc-800 transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>查看完整候选名单 (<span id="start-count">92</span>)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW 2: STAGE BATTLE SCREEN -->
+        <div id="view-battle" class="hidden space-y-6">
+            <!-- Stage Info & Progress Header -->
+            <div class="glass-panel p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-3 w-full sm:w-auto">
+                    <div id="stage-icon-box" class="w-9 h-9 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center font-bold text-sm">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-zinc-400" id="stage-subtitle">第一轮 · 小组盲选</div>
+                        <div class="text-sm font-bold text-white" id="stage-title-text">当前组：第 1 组 / 共 11 组 (每组 9 选 3)</div>
+                    </div>
+                </div>
+                <div class="w-full sm:w-64 bg-zinc-800 h-2.5 rounded-full overflow-hidden">
+                    <div id="stage-progress-bar" class="bg-gradient-to-r from-pink-500 to-purple-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                    <span id="selection-counter" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-pink-500/10 text-pink-400 border border-pink-500/20">已选: 0 / 3</span>
+                </div>
+            </div>
+
+            <!-- Instruction & Selection Prompt -->
+            <div class="text-center space-y-1">
+                <h3 id="battle-main-prompt" class="text-xl sm:text-2xl font-black text-white tracking-wide">请从本组乐队中挑选出你最喜欢的 <span class="text-pink-500" id="pick-limit-text">3 组</span></h3>
+                <p id="battle-sub-prompt" class="text-xs sm:text-sm text-zinc-400">点击卡片进行多选，选满后点击下方“确认晋级本组”按钮进入下一轮</p>
+            </div>
+
+            <!-- Grid of 9 or 6 Cards -->
+            <div id="candidates-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                <!-- Dynamically populated -->
+            </div>
+
+            <!-- Confirm Group Action Bar -->
+            <div class="flex items-center justify-center pt-4">
+                <button id="confirm-group-btn" onclick="confirmGroupSelection()" disabled class="px-8 py-3.5 rounded-xl bg-zinc-800 text-zinc-500 font-bold text-sm cursor-not-allowed transition flex items-center space-x-2 shadow-lg">
+                    <span>请先选择所需数量</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW 3: FINALE 2V1 RANKING ADJUSTMENT (If needed for fine-tuning Top 9 order) -->
+        <div id="view-finale" class="hidden space-y-6">
+            <div class="text-center space-y-2">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                    <i class="fa-solid fa-crown"></i> 巅峰 9 强决选 · 2选1微调顺序
+                </span>
+                <h3 class="text-2xl sm:text-4xl font-black text-white">微调你的 Top 9 最终排位</h3>
+                <p class="text-xs sm:text-sm text-zinc-400">最后通过几轮精细的 2v1 对决，确定你心目中的绝对冠亚季军与 4-9 名次排序！</p>
+            </div>
+
+            <!-- 2v1 Duel Arena -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <!-- Choice Left -->
+                <div onclick="chooseFinalDuel('left')" class="glass-panel p-6 rounded-3xl cursor-pointer card-hover flex flex-col items-center text-center relative group border-2 border-zinc-800 hover:border-pink-500">
+                    <div class="absolute top-4 left-4 px-3 py-1 rounded-full bg-zinc-900/80 text-xs font-bold text-pink-400 border border-zinc-700">
+                        候选 A
+                    </div>
+                    <div class="w-full h-48 sm:h-64 rounded-2xl overflow-hidden mb-6 bg-zinc-900 relative shadow-inner">
+                        <img id="final-img-left" src="" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/600x400/18181b/ec4899?text=Band'">
+                    </div>
+                    <h4 id="final-name-left" class="text-2xl font-black text-white mb-2">乐队名称</h4>
+                    <button class="w-full py-3 rounded-xl bg-zinc-900 border border-zinc-700 group-hover:bg-gradient-to-r group-hover:from-pink-600 group-hover:to-purple-600 group-hover:border-transparent text-white font-bold text-sm transition">
+                        更喜欢这个 <i class="fa-solid fa-check ml-1"></i>
+                    </button>
+                </div>
+
+                <!-- Choice Right -->
+                <div onclick="chooseFinalDuel('right')" class="glass-panel p-6 rounded-3xl cursor-pointer card-hover flex flex-col items-center text-center relative group border-2 border-zinc-800 hover:border-purple-500">
+                    <div class="absolute top-4 left-4 px-3 py-1 rounded-full bg-zinc-900/80 text-xs font-bold text-purple-400 border border-zinc-700">
+                        候选 B
+                    </div>
+                    <div class="w-full h-48 sm:h-64 rounded-2xl overflow-hidden mb-6 bg-zinc-900 relative shadow-inner">
+                        <img id="final-img-right" src="" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/600x400/18181b/a855f7?text=Band'">
+                    </div>
+                    <h4 id="final-name-right" class="text-2xl font-black text-white mb-2">乐队名称</h4>
+                    <button class="w-full py-3 rounded-xl bg-zinc-900 border border-zinc-700 group-hover:bg-gradient-to-r group-hover:from-purple-600 group-hover:to-indigo-600 group-hover:border-transparent text-white font-bold text-sm transition">
+                        更喜欢这个 <i class="fa-solid fa-check ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-center pt-2">
+                <button onclick="skipFinalDuel()" class="text-xs text-zinc-500 hover:text-zinc-300 underline underline-offset-4 transition">
+                    跳过微调，直接生成 Top 9 结果
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW 4: RESULT POSTER SCREEN -->
+        <div id="view-result" class="hidden space-y-8 py-4">
+            <div class="text-center space-y-2">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <i class="fa-solid fa-check-circle"></i> 甄选圆满完成！
+                </span>
+                <h2 class="text-3xl sm:text-5xl font-black text-white">我的韩国乐队本命 <span class="text-pink-500">Top 9</span></h2>
+                <p class="text-zinc-400 text-sm">通过分阶段科学算法为你专属打造的韩系乐队金字塔排行榜</p>
+            </div>
+
+            <!-- Poster Card Container -->
+            <div id="capture-poster" class="max-w-3xl mx-auto rounded-3xl bg-gradient-to-b from-zinc-900 via-zinc-900/95 to-zinc-950 border border-zinc-800 p-6 sm:p-10 shadow-2xl space-y-8 relative overflow-hidden">
+                <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-pink-600/10 blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-purple-600/10 blur-3xl pointer-events-none"></div>
+
+                <!-- Poster Header -->
+                <div class="flex items-center justify-between border-b border-zinc-800/80 pb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-600 to-purple-600 flex items-center justify-center shadow-lg shadow-pink-600/30">
+                            <i class="fa-solid fa-headphones text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-black text-xl text-white tracking-wider">K-BAND ULTIMATE TOP 9</h3>
+                            <p class="text-xs text-zinc-400">分阶段盲选晋级 · 个人音乐本命排行</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs font-bold text-pink-400">MY FAVOURITES</div>
+                        <div class="text-[10px] text-zinc-500" id="poster-date">2026.10.04</div>
+                    </div>
+                </div>
+
+                <!-- Top 1 (Hero Spot) -->
+                <div class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-pink-950/40 via-purple-950/40 to-zinc-900 border border-pink-500/40 p-4 sm:p-6 flex items-center space-x-6 shadow-xl">
+                    <div class="absolute top-3 right-4 px-3 py-1 rounded-full bg-pink-500 text-white font-black text-xs tracking-wider shadow-lg flex items-center space-x-1">
+                        <i class="fa-solid fa-crown text-yellow-300"></i>
+                        <span>NO. 1 本命</span>
+                    </div>
+                    <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden flex-shrink-0 bg-zinc-800 shadow-md">
+                        <img id="poster-img-1" src="" class="w-full h-full object-cover">
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-bold text-pink-400 uppercase tracking-widest">Ultimate Choice</span>
+                        <h4 id="poster-name-1" class="text-2xl sm:text-4xl font-black text-white">乐队名称</h4>
+                        <p class="text-xs sm:text-sm text-zinc-400">经过层层小组与半决赛突围的至高本命乐队</p>
+                    </div>
+                </div>
+
+                <!-- Top 2-9 Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4" id="poster-grid-2-9">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Poster Footer -->
+                <div class="flex items-center justify-between pt-4 border-t border-zinc-800/80 text-[11px] text-zinc-500">
+                    <div>Generated by K-Band Stage Ranker App</div>
+                    <div class="font-mono text-zinc-400">#KIndie #KoreanBand #Top9</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+                <button onclick="downloadPoster()" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold text-sm shadow-lg shadow-pink-600/30 hover:shadow-pink-600/50 hover:scale-105 transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-download"></i>
+                    <span>保存精美海报图片</span>
+                </button>
+                <button onclick="restartProcess()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-300 font-semibold text-sm hover:bg-zinc-800 transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>重新开始甄选</span>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Customizer Modal -->
+    <div id="customizer-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 sm:p-8 space-y-6 max-h-[90vh] flex flex-col border border-zinc-700 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+                <div>
+                    <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-sliders text-pink-500"></i>
+                        <span>候选乐队与图片管理</span>
+                    </h3>
+                    <p class="text-xs text-zinc-400">可自定义修改乐队图片链接，查看全部 92 组候选乐队</p>
+                </div>
+                <button onclick="closeCustomizerModal()" class="w-8 h-8 rounded-full bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="relative">
+                <i class="fa-solid fa-search absolute left-4 top-3.5 text-zinc-500 text-sm"></i>
+                <input type="text" id="modal-search" oninput="filterModalBands()" placeholder="搜索乐队名称..." class="w-full bg-zinc-900/90 border border-zinc-700 rounded-xl pl-11 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500 transition">
+            </div>
+
+            <div class="overflow-y-auto flex-grow space-y-3 pr-2" id="modal-band-list"></div>
+
+            <div class="flex items-center justify-between border-t border-zinc-800 pt-4">
+                <div class="text-xs text-zinc-400">共加载 <span id="modal-total-count">0</span> 组韩国乐队</div>
+                <div class="flex space-x-3">
+                    <button onclick="resetDefaultBands()" class="px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-xs text-zinc-300 hover:bg-zinc-800 transition">恢复默认图片</button>
+                    <button onclick="closeCustomizerModal()" class="px-5 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs shadow-lg shadow-pink-600/30 transition">保存并返回</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-zinc-800/80 bg-zinc-950 py-6 text-center text-xs text-zinc-500 space-y-2">
+        <p>K-Indie & Rock Stage Ranker · Multi-Stage Selection Tool</p>
+        <p class="text-zinc-600">Featuring DAY6, QWER, Xdinary Heroes, FTIsland, CNBLUE, N.Flying, Silicagel, Jannabi, and many more.</p>
+    </footer>
+
+    <!-- App Logic -->
+    <script>
+        const rawBandNames = [
+            "DAY6", "QWER", "XdinaryHeroes", "FTIsland", "CNBLUE", "N.Flying", "AxMxP", "ONEWE", "LUCY", 
+            "splayit", "hrtz.wav", "HiFi-Unicorn", "catch the young", "V01D", "Chrocktikal", "Dragon Pony", 
+            "skipjack", "DADADA", "Redoor", "creespy", "The Fix", "KARDI", "NerdConnection", "Can't be blue", 
+            "Tokai", "simileland", "Silicagel", "Far east asian tigers", "RedC", "leeparan", "李承允", "POSER", 
+            "NELL", "crying nut", "NoBrain", "bluhwa", "jisokuryclub", "blueisnotblue", "dabda", "sonlmor", 
+            "喜鹊山", "illuvan", "HANRORO", "TuesdayBeachClub", "DamonsYear", "Adios Audio", "THORNAPPLE", 
+            "ConfinedWhite", "Broken Valentine", "gogohawk", "PEPPERTONES", "YB", "the solutions", "Crackshot", 
+            "HYANG", "WOODZ", "gift", "The Rose", "W24", "Lacuna", "新人类", "五月五日", "ANARKI CULTURE", 
+            "87dance", "HEYMEN", "ONDO", "MGFF", "TOUCHED", "MOWS", "PATZ", "紫雨林", "Noa Coast", 
+            "FuturePeerClub", "KYUDO", "FRankly", "igloobay", "sanbo", "KYSB", "Jannabi", "wave to earth", 
+            "The Poles", "YDBB", "SURL", "Balming Tiger", "Parannoul", "offthemenu"
+        ];
+
+        const uniqueNames = Array.from(new Set(rawBandNames.map(n => n.trim()))).filter(n => n.length > 0);
+        let customImages = JSON.parse(localStorage.getItem('k_band_custom_images_v2') || '{}');
+
+        function getBandImage(name) {
+            if (customImages[name]) return customImages[name];
+            const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            const photoIds = [
+                "1511671782779-c97d3d27a1d4", "1470225620780-dba8ba36b745", "1514525253161-7a46d19cd819",
+                "1465847899084-d164df4dedc6", "1510915361894-db8b60106cb1", "1501386761578-eac5c94b800a",
+                "1516450360452-9312f5e86fc7", "1498038432885-c6f3f1b912ee", "1526478806334-5fd488fcaabc"
+            ];
+            return `https://images.unsplash.com/photo-${photoIds[hash % photoIds.length]}?w=600&auto=format&fit=crop&q=80`;
         }
-        renderGroupCards();
-        updateNextButtonState();
-    }
 
-    function updateNextButtonState() {
-        const btn = document.getElementById('next-btn');
-        document.getElementById('selected-count').innerText = userSelectedNames.size;
-
-        if (userSelectedNames.size === requiredSelectNum) {
-            btn.disabled = false;
-            btn.className = "px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-sm hover:opacity-95 transition shadow-lg cursor-pointer";
-            btn.innerText = "确认选择，进入下一组 ➔";
-        } else {
-            btn.disabled = true;
-            btn.className = "px-6 py-3 rounded-xl bg-stone-800 text-stone-500 font-bold text-sm cursor-not-allowed transition shadow-lg";
-            btn.innerText = `请再选择 ${requiredSelectNum - userSelectedNames.size} 个乐队`;
+        let bands = [];
+        function initBands() {
+            bands = uniqueNames.map((name, index) => ({
+                id: index,
+                name: name,
+                image: getBandImage(name)
+            }));
+            document.getElementById('header-band-count').innerText = bands.length;
+            document.getElementById('start-count').innerText = bands.length;
         }
-    }
 
-    function submitCurrentGroup() {
-        if (userSelectedNames.size !== requiredSelectNum) return;
+        // Multi-stage state variables
+        let stageState = 1; // 1: Round 1 (9选3), 2: Round 2 (6选3), 3: Finale Duel
+        let round1Groups = [];
+        let currentGroupIndex = 0;
+        let round1Qualifiers = [];
+        let selectedInCurrentGroup = [];
 
-        userSelectedNames.forEach(name => {
-            let band = bandsData.find(b => b.name === name);
-            if (band) {
-                band.votes++;
-                band.score += (currentStageIndex < 31 ? 2 : (currentStageIndex < 46 ? 4 : 8));
+        let round2Groups = [];
+        let round2Qualifiers = [];
+
+        let finalTop9List = [];
+        let finalDuelQueue = [];
+        let currentDuelPair = null;
+
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
             }
-        });
+            return arr;
+        }
 
-        currentStageIndex++;
-        loadGroup();
-    }
+        function startStageProcess() {
+            let shuffled = shuffleArray(bands);
+            round1Groups = [];
+            // Chunk into groups of 9
+            for (let i = 0; i < shuffled.length; i += 9) {
+                round1Groups.push(shuffled.slice(i, i + 9));
+            }
 
-    function showResults() {
-        document.getElementById('voting-screen').classList.add('hidden');
-        document.getElementById('result-screen').classList.remove('hidden');
+            currentGroupIndex = 0;
+            round1Qualifiers = [];
+            stageState = 1;
 
-        bandsData.forEach(b => {
-            let winRate = b.appearances > 0 ? (b.votes / b.appearances) : 0;
-            b.finalScore = b.score + (winRate * 15);
-        });
+            document.getElementById('view-welcome').classList.add('hidden');
+            document.getElementById('view-result').classList.add('hidden');
+            document.getElementById('view-finale').classList.add('hidden');
+            document.getElementById('view-battle').classList.remove('hidden');
 
-        bandsData.sort((a, b) => b.finalScore - a.finalScore);
-        const top9 = bandsData.slice(0, 9);
+            loadRound1Group();
+        }
 
-        const grid = document.getElementById('top9-grid');
-        grid.innerHTML = '';
+        // --- ROUND 1: 9选3 ---
+        function loadRound1Group() {
+            if (currentGroupIndex >= round1Groups.length) {
+                // Round 1 completed, move to Round 2 (6选3)
+                startRound2();
+                return;
+            }
 
-        top9.forEach((band, index) => {
-            const rank = index + 1;
-            const imgUrl = getBandImage(band.name);
+            selectedInCurrentGroup = [];
+            let groupBands = round1Groups[currentGroupIndex];
+
+            document.getElementById('stage-subtitle').innerText = "第一轮 · 小组盲选";
+            document.getElementById('stage-title-text').innerText = `当前组：第 ${currentGroupIndex + 1} 组 / 共 ${round1Groups.length} 组 (每组 9 选 3)`;
+            document.getElementById('pick-limit-text').innerText = `3 组`;
             
-            let rankBadgeColor = 'bg-stone-800 text-stone-300 border-stone-700';
-            if (rank === 1) rankBadgeColor = 'bg-amber-500 text-stone-950 font-black border-amber-400';
-            if (rank === 2) rankBadgeColor = 'bg-slate-300 text-stone-950 font-black border-slate-200';
-            if (rank === 3) rankBadgeColor = 'bg-amber-700 text-white font-black border-amber-600';
+            let pct = Math.round((currentGroupIndex / round1Groups.length) * 50);
+            document.getElementById('stage-progress-bar').style.width = `${pct}%`;
 
-            const item = document.createElement('div');
-            item.className = 'bg-stone-950/70 border border-stone-800/80 rounded-xl p-2.5 flex flex-col items-center text-center relative overflow-hidden';
-            item.innerHTML = `
-                <div class="absolute top-2 left-2 w-6 h-6 rounded-md ${rankBadgeColor} text-xs flex items-center justify-center shadow-md z-10">
-                    #${rank}
-                </div>
-                <div class="w-full h-24 sm:h-28 rounded-lg overflow-hidden mb-2 bg-stone-900">
-                    <img src="${imgUrl}" alt="${band.name}" class="w-full h-full object-cover" onerror="this.src='[https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80](https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80)'">
-                </div>
-                <h4 class="font-bold text-xs sm:text-sm text-stone-100 line-clamp-1 w-full">${band.name}</h4>
-            `;
-            grid.appendChild(item);
-        });
-    }
+            renderCandidatesGrid(groupBands, 3);
+            updateConfirmButtonState(3);
+        }
 
-    function downloadPoster() {
-        const poster = document.getElementById('poster-card');
-        html2canvas(poster, {
-            scale: 2,
-            backgroundColor: '#0c0a09',
-            useCORS: true
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'My-K-Band-Top9.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }).catch(err => {
-            alert('生成海报失败，请截图保存。');
-        });
-    }
-</script>
+        function renderCandidatesGrid(bandList, maxPick) {
+            let grid = document.getElementById('candidates-grid');
+            grid.innerHTML = '';
+
+            bandList.forEach(band => {
+                let isSelected = selectedInCurrentGroup.includes(band.id);
+                let card = document.createElement('div');
+                card.className = `glass-panel p-4 rounded-2xl cursor-pointer card-hover flex flex-col items-center text-center relative border-2 transition ${isSelected ? 'border-pink-500 bg-pink-500/10 shadow-lg shadow-pink-500/20' : 'border-zinc-800'}`;
+                card.onclick = () => toggleSelectBand(band.id, maxPick);
+
+                card.innerHTML = `
+                    <div class="absolute top-3 right-3 w-6 h-6 rounded-full ${isSelected ? 'bg-pink-500 text-white' : 'bg-zinc-800 text-zinc-500'} flex items-center justify-center text-xs font-bold transition">
+                        ${isSelected ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-plus"></i>'}
+                    </div>
+                    <div class="w-full h-32 sm:h-40 rounded-xl overflow-hidden mb-3 bg-zinc-900">
+                        <img src="${band.image}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/18181b/ec4899?text=Band'">
+                    </div>
+                    <h5 class="text-base font-bold text-white truncate w-full">${band.name}</h5>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleSelectBand(id, maxPick) {
+            let index = selectedInCurrentGroup.indexOf(id);
+            if (index > -1) {
+                selectedInCurrentGroup.splice(index, 1);
+            } else {
+                if (selectedInCurrentGroup.length >= maxPick) {
+                    alert(`最多只能选择 ${maxPick} 组乐队！`);
+                    return;
+                }
+                selectedInCurrentGroup.push(id);
+            }
+
+            // Re-render grid & update button
+            if (stageState === 1) {
+                renderCandidatesGrid(round1Groups[currentGroupIndex], 3);
+                updateConfirmButtonState(3);
+            } else if (stageState === 2) {
+                renderCandidatesGrid(round2Groups[currentGroupIndex], 3);
+                updateConfirmButtonState(3);
+            }
+        }
+
+        function updateConfirmButtonState(maxPick) {
+            let btn = document.getElementById('confirm-group-btn');
+            let counter = document.getElementById('selection-counter');
+            counter.innerText = `已选: ${selectedInCurrentGroup.length} / ${maxPick}`;
+
+            if (selectedInCurrentGroup.length === maxPick) {
+                btn.disabled = false;
+                btn.className = "px-8 py-3.5 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold text-sm shadow-lg shadow-pink-600/30 hover:scale-105 transition flex items-center space-x-2";
+                btn.innerHTML = `<span>确认并晋级下一组</span> <i class="fa-solid fa-arrow-right"></i>`;
+            } else {
+                btn.disabled = true;
+                btn.className = "px-8 py-3.5 rounded-xl bg-zinc-800 text-zinc-500 font-bold text-sm cursor-not-allowed transition flex items-center space-x-2";
+                btn.innerHTML = `<span>请再选择 ${maxPick - selectedInCurrentGroup.length} 组乐队</span>`;
+            }
+        }
+
+        function confirmGroupSelection() {
+            if (stageState === 1) {
+                let groupBands = round1Groups[currentGroupIndex];
+                selectedInCurrentGroup.forEach(id => {
+                    let b = groupBands.find(item => item.id === id);
+                    if (b) round1Qualifiers.push(b);
+                });
+                currentGroupIndex++;
+                loadRound1Group();
+            } else if (stageState === 2) {
+                let groupBands = round2Groups[currentGroupIndex];
+                selectedInCurrentGroup.forEach(id => {
+                    let b = groupBands.find(item => item.id === id);
+                    if (b) round2Qualifiers.push(b);
+                });
+                currentGroupIndex++;
+                loadRound2Group();
+            }
+        }
+
+        // --- ROUND 2: 6选3 ---
+        function startRound2() {
+            stageState = 2;
+            let shuffledQualifiers = shuffleArray(round1Qualifiers);
+            round2Groups = [];
+            // Chunk round1 qualifiers into groups of 6
+            for (let i = 0; i < shuffledQualifiers.length; i += 6) {
+                round2Groups.push(shuffledQualifiers.slice(i, i + 6));
+            }
+            // If any group has fewer than 6, merge or handle smoothly
+            currentGroupIndex = 0;
+            round2Qualifiers = [];
+
+            loadRound2Group();
+        }
+
+        function loadRound2Group() {
+            if (currentGroupIndex >= round2Groups.length) {
+                // Round 2 completed, collect Top 9 candidates
+                finalizeTop9Candidates();
+                return;
+            }
+
+            selectedInCurrentGroup = [];
+            let groupBands = round2Groups[currentGroupIndex];
+
+            document.getElementById('stage-subtitle').innerText = "第二轮 · 半决赛 6选3";
+            document.getElementById('stage-title-text').innerText = `半决赛组：第 ${currentGroupIndex + 1} 组 / 共 ${round2Groups.length} 组 (每组 6 选 3)`;
+            document.getElementById('pick-limit-text').innerText = `3 组`;
+
+            let pct = 50 + Math.round((currentGroupIndex / round2Groups.length) * 40);
+            document.getElementById('stage-progress-bar').style.width = `${pct}%`;
+
+            renderCandidatesGrid(groupBands, 3);
+            updateConfirmButtonState(3);
+        }
+
+        // --- FINALE SETUP & 2V1 MICRO-ADJUSTMENT ---
+        function finalizeTop9Candidates() {
+            // Collect all round2 qualifiers
+            let pool = round2Qualifiers;
+            // If we have more than 9, slice top 9. If fewer than 9, take all round1/round2 pool.
+            if (pool.length > 9) {
+                pool = pool.slice(0, 9);
+            } else if (pool.length < 9) {
+                // Fill up from round1
+                let needed = 9 - pool.length;
+                let extra = round1Qualifiers.filter(b => !pool.includes(b)).slice(0, needed);
+                pool = [...pool, ...extra];
+            }
+
+            finalTop9List = pool;
+
+            // Transition to Finale 2v1 Duel for sorting order
+            startFinalDuels();
+        }
+
+        let duelPairIndex = 0;
+        let duelPairsList = [];
+
+        function startFinalDuels() {
+            stageState = 3;
+            document.getElementById('view-battle').classList.add('hidden');
+            document.getElementById('view-finale').classList.remove('hidden');
+
+            // Generate pairs for quick bubble/insertion-like adjustment among the Top 9
+            duelPairsList = [];
+            for (let i = 0; i < finalTop9List.length - 1; i++) {
+                duelPairsList.push({ left: i, right: i + 1 });
+            }
+            duelPairIndex = 0;
+            loadNextFinalDuel();
+        }
+
+        function loadNextFinalDuel() {
+            if (duelPairIndex >= Math.min(6, duelPairsList.length)) {
+                finishTop9Ranking();
+                return;
+            }
+
+            let pair = duelPairsList[duelPairIndex];
+            let bLeft = finalTop9List[pair.left];
+            let bRight = finalTop9List[pair.right];
+
+            document.getElementById('final-img-left').src = bLeft.image;
+            document.getElementById('final-name-left').innerText = bLeft.name;
+
+            document.getElementById('final-img-right').src = bRight.image;
+            document.getElementById('final-name-right').innerText = bRight.name;
+        }
+
+        function chooseFinalDuel(choice) {
+            let pair = duelPairsList[duelPairIndex];
+            if (choice === 'right') {
+                // Swap order in Top 9 list
+                let temp = finalTop9List[pair.left];
+                finalTop9List[pair.left] = finalTop9List[pair.right];
+                finalTop9List[pair.right] = temp;
+            }
+            duelPairIndex++;
+            loadNextFinalDuel();
+        }
+
+        function skipFinalDuel() {
+            finishTop9Ranking();
+        }
+
+        // --- FINISH & POSTER ---
+        function finishTop9Ranking() {
+            document.getElementById('view-finale').classList.add('hidden');
+            document.getElementById('view-result').classList.remove('hidden');
+
+            renderResultPoster();
+
+            confetti({
+                particleCount: 130,
+                spread: 90,
+                origin: { y: 0.6 }
+            });
+        }
+
+        function renderResultPoster() {
+            const now = new Date();
+            document.getElementById('poster-date').innerText = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+
+            // Top 1
+            let top1 = finalTop9List[0];
+            if (top1) {
+                document.getElementById('poster-img-1').src = top1.image;
+                document.getElementById('poster-name-1').innerText = top1.name;
+            }
+
+            // Top 2-9 Grid
+            let gridContainer = document.getElementById('poster-grid-2-9');
+            gridContainer.innerHTML = '';
+
+            for (let i = 1; i < 9; i++) {
+                let band = finalTop9List[i];
+                if (!band) break;
+
+                let card = document.createElement('div');
+                card.className = "bg-zinc-900/90 border border-zinc-800 rounded-xl p-3 flex items-center space-x-3 shadow-md relative group hover:border-pink-500/50 transition";
+                card.innerHTML = `
+                    <div class="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-zinc-800 border border-zinc-700 text-pink-400 font-black text-xs flex items-center justify-center shadow">
+                        ${i + 1}
+                    </div>
+                    <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-zinc-800">
+                        <img src="${band.image}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/200x200/18181b/ec4899?text=Band'">
+                    </div>
+                    <div class="min-w-0 flex-grow">
+                        <div class="text-[10px] text-pink-400 font-bold uppercase tracking-wider">TOP ${i + 1}</div>
+                        <h5 class="text-sm font-bold text-white truncate">${band.name}</h5>
+                    </div>
+                `;
+                gridContainer.appendChild(card);
+            }
+        }
+
+        function restartProcess() {
+            document.getElementById('view-result').classList.add('hidden');
+            document.getElementById('view-welcome').classList.remove('hidden');
+        }
+
+        function downloadPoster() {
+            const posterElement = document.getElementById('capture-poster');
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 正在生成海报...`;
+            btn.disabled = true;
+
+            html2canvas(posterElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#0f0f13'
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `K-Band-Stage-Top9.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }).catch(err => {
+                console.error(err);
+                alert("海报生成失败，请直接截图保存。");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+
+        // Customizer modal
+        function openCustomizerModal() {
+            renderModalBandList();
+            document.getElementById('customizer-modal').classList.remove('hidden');
+        }
+
+        function closeCustomizerModal() {
+            document.getElementById('customizer-modal').classList.add('hidden');
+            bands.forEach(b => {
+                b.image = getBandImage(b.name);
+            });
+        }
+
+        function renderModalBandList(filterText = '') {
+            const container = document.getElementById('modal-band-list');
+            container.innerHTML = '';
+
+            let filtered = bands.filter(b => b.name.toLowerCase().includes(filterText.toLowerCase()));
+            document.getElementById('modal-total-count').innerText = filtered.length;
+
+            filtered.forEach(band => {
+                let item = document.createElement('div');
+                item.className = "flex items-center justify-between bg-zinc-900/60 border border-zinc-800 rounded-xl p-3 gap-4";
+                item.innerHTML = `
+                    <div class="flex items-center space-x-3 flex-grow">
+                        <img src="${band.image}" class="w-12 h-12 rounded-lg object-cover bg-zinc-800 flex-shrink-0" onerror="this.src='https://placehold.co/100x100/18181b/ec4899?text=Band'">
+                        <div class="min-w-0">
+                            <h5 class="text-sm font-bold text-white truncate">${band.name}</h5>
+                            <p class="text-[11px] text-zinc-500 truncate">自定义图片直链URL</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 flex-shrink-0">
+                        <input type="text" id="input-img-${band.id}" value="${customImages[band.name] || ''}" placeholder="粘贴图片直链..." class="w-40 sm:w-64 bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-pink-500">
+                        <button onclick="saveBandImage(${band.id})" class="px-3 py-1.5 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs transition">保存</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function filterModalBands() {
+            let query = document.getElementById('modal-search').value;
+            renderModalBandList(query);
+        }
+
+        function saveBandImage(id) {
+            let band = bands.find(b => b.id === id);
+            let inputVal = document.getElementById(`input-img-${id}`).value.trim();
+            if (inputVal) {
+                customImages[band.name] = inputVal;
+            } else {
+                delete customImages[band.name];
+            }
+            localStorage.setItem('k_band_custom_images_v2', JSON.stringify(customImages));
+            band.image = getBandImage(band.name);
+            renderModalBandList(document.getElementById('modal-search').value);
+        }
+
+        function resetDefaultBands() {
+            if (confirm("确定要恢复默认图片吗？")) {
+                customImages = {};
+                localStorage.removeItem('k_band_custom_images_v2');
+                bands.forEach(b => {
+                    b.image = getBandImage(b.name);
+                });
+                renderModalBandList(document.getElementById('modal-search').value);
+            }
+        }
+
+        window.onload = function() {
+            initBands();
+        };
+    </script>
+</body>
+</html>
